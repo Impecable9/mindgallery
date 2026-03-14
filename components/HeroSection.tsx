@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Language } from '../types';
 import { UI_TRANSLATIONS } from '../constants';
-import { Crown, MessageSquare, Search, Dices, LogIn, BookOpen } from 'lucide-react';
+import { Crown, MessageSquare, Search, Dices, ShoppingBag, BookOpen, Package, Shirt, Coffee, Smartphone, Star } from 'lucide-react';
 
 interface HeroSectionProps {
   isNegativeMode: boolean;
   language: Language;
   globalConfig?: any;
+  onShopClick?: () => void;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, globalConfig }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, globalConfig, onShopClick }) => {
   const t = UI_TRANSLATIONS[language];
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -19,8 +20,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, glo
     <MessageSquare size={20} className="text-rose-500" />,
     <Search size={20} className="text-blue-500" />,
     <Dices size={20} className="text-purple-500" />,
-    <LogIn size={20} className="text-emerald-500" />,
+    <ShoppingBag size={20} className="text-emerald-500" />,
     <BookOpen size={20} className="text-amber-500" />
+  ];
+
+  const PRODUCT_PILLS = [
+    { icon: <Package size={14} />, label: 'Prints' },
+    { icon: <Shirt size={14} />, label: 'Clothing' },
+    { icon: <Coffee size={14} />, label: 'Mugs' },
+    { icon: <Smartphone size={14} />, label: 'Cases' },
+    { icon: <Star size={14} />, label: 'Stickers' },
   ];
 
   useEffect(() => {
@@ -125,6 +134,32 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, glo
               </div>
           </motion.div>
         </AnimatePresence>
+      </div>
+      {/* Shop CTA — bottom right */}
+      <div className="absolute bottom-8 right-6 md:right-12 z-10 max-w-xs">
+        <div className={`p-4 rounded-2xl border backdrop-blur-xl shadow-lg ${
+          isNegativeMode ? 'bg-black/60 border-white/10' : 'bg-white/70 border-white/40'
+        }`}>
+          <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${
+            isNegativeMode ? 'text-slate-400' : 'text-slate-500'
+          }`}>🛒 Wear Your Thoughts</p>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {PRODUCT_PILLS.map(p => (
+              <span key={p.label} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium border ${
+                isNegativeMode ? 'bg-white/10 border-white/20 text-white' : 'bg-slate-100 border-slate-200 text-slate-700'
+              }`}>
+                {p.icon}{p.label}
+              </span>
+            ))}
+          </div>
+          <button
+            onClick={onShopClick}
+            className="w-full py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg"
+          >
+            <ShoppingBag size={16} />
+            Explore Products
+          </button>
+        </div>
       </div>
     </div>
   );

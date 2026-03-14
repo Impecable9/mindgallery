@@ -4,7 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { AspectRatio, Thought, StyleConfig, FontFamily, TextAlign, TextColor, FrameColor, LogoStyle, ArtStyle, Language } from '../types';
-import { X, Download, Palette, Maximize2, Type, Check, Sparkles, Image as ImageIcon, Frame, Stamp, Loader2, CircleOff, Pencil, Armchair, BedDouble, Briefcase, ZoomIn, Globe, Eye, EyeOff, User, UserMinus, FileImage, FileText, Sun, Moon, BookOpen, Zap, MoveRight, ArrowDown, Smartphone, Layers } from 'lucide-react';
+import { X, Download, Palette, Maximize2, Type, Check, Sparkles, Image as ImageIcon, Frame, Stamp, Loader2, CircleOff, Pencil, Armchair, BedDouble, Briefcase, ZoomIn, Globe, Eye, EyeOff, User, UserMinus, FileImage, FileText, Sun, Moon, BookOpen, Zap, MoveRight, ArrowDown, Smartphone, Layers, ShoppingBag } from 'lucide-react';
 import { COLOR_MAP, FRAME_STYLES, LOGO_COMPONENTS, ART_STYLES_CSS, AI_PROMPTS, UI_TRANSLATIONS } from '../constants';
 
 interface ModalProps {
@@ -16,6 +16,7 @@ interface ModalProps {
   allThoughts?: Thought[];
   onSelectThought?: (thought: Thought) => void;
   onSearch?: (query: string) => void;
+  onOpenPurchase?: (thought: Thought, imageUrl: string) => void;
 }
 
 // Mockup backgrounds
@@ -36,7 +37,8 @@ const Modal: React.FC<ModalProps> = ({
   initialIsNegative = false,
   allThoughts,
   onSelectThought,
-  onSearch
+  onSearch,
+  onOpenPurchase
 }) => {
   const [localAspectRatio, setLocalAspectRatio] = useState<AspectRatio>(initialAspectRatio);
   const [viewMode, setViewMode] = useState<ViewMode>('studio');
@@ -769,6 +771,22 @@ const Modal: React.FC<ModalProps> = ({
                      {t.btnDownload} {downloadFormat.toUpperCase()}
                    </button>
                    
+                   {/* BUY THIS THOUGHT */}
+                   <button
+                     onClick={() => {
+                       if (onOpenPurchase && thought) {
+                         const canvas = printRef.current;
+                         const imageUrl = canvas ? canvas.toDataURL?.('image/jpeg', 0.9) || '' : '';
+                         onOpenPurchase(thought, imageUrl);
+                         onClose();
+                       }
+                     }}
+                     className="w-full py-4 rounded-xl font-bold text-sm tracking-wide uppercase shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white"
+                   >
+                     <ShoppingBag size={18} />
+                     Order This on a Product
+                   </button>
+
                    {/* Donation Button */}
                    <a 
                      href="https://ko-fi.com" // Placeholder

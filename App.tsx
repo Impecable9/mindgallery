@@ -28,6 +28,7 @@ const App: React.FC = () => {
   
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [thoughtToPurchase, setThoughtToPurchase] = useState<Thought | null>(null);
+  const [purchaseImageUrl, setPurchaseImageUrl] = useState<string>('');
   
   // Roulette State
   const [isRouletteOpen, setIsRouletteOpen] = useState(false);
@@ -104,8 +105,9 @@ const App: React.FC = () => {
      setSelectedThought(thought);
   };
 
-  const handleOpenPurchase = (thought: Thought) => {
+  const handleOpenPurchase = (thought: Thought, imageUrl?: string) => {
     setThoughtToPurchase(thought);
+    setPurchaseImageUrl(imageUrl || '');
     setIsPurchaseModalOpen(true);
   };
 
@@ -192,7 +194,10 @@ const App: React.FC = () => {
 
              {/* Shop Button */}
              <button
-               onClick={() => { if (thoughtToPurchase) setIsPurchaseModalOpen(true); }}
+               onClick={() => {
+                 const firstThought = THOUGHTS_DATA[0];
+                 if (firstThought) handleOpenPurchase(firstThought, '');
+               }}
                title="Open Shop"
                className={`p-2 rounded-full transition-all border flex items-center gap-2 px-3 ${
                  isNegativeMode ? 'bg-white/10 text-white border-white/20' : 'bg-white/50 text-slate-600 border-white/40'
@@ -349,7 +354,7 @@ const App: React.FC = () => {
         {viewMode === 'GALLERY' ? (
           <>
             {/* New Hero Section showing mockups */}
-            <HeroSection isNegativeMode={isNegativeMode} language={language} globalConfig={globalConfig} />
+            <HeroSection isNegativeMode={isNegativeMode} language={language} globalConfig={globalConfig} onShopClick={() => { const firstThought = THOUGHTS_DATA[0]; if (firstThought) handleOpenPurchase(firstThought, ''); }} />
 
             {/* Context Header */}
             <div className="text-center mb-8">
@@ -512,6 +517,7 @@ const App: React.FC = () => {
           setSelectedThought(null);
           setViewMode('GALLERY');
         }}
+        onOpenPurchase={handleOpenPurchase}
       />
       
       {/* Roulette Game Overlay */}
@@ -525,7 +531,7 @@ const App: React.FC = () => {
       {isPurchaseModalOpen && thoughtToPurchase && (
         <PurchaseModal
           thought={thoughtToPurchase}
-          imageUrl={`/api/render-thought?id=${thoughtToPurchase.id}`}
+          imageUrl={purchaseImageUrl}
           onClose={() => setIsPurchaseModalOpen(false)}
           language={language}
         />
