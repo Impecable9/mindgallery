@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, User, Sparkles, Loader2, ExternalLink } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 import { Language, Thought } from '../types';
 import { UI_TRANSLATIONS } from '../constants';
 
@@ -40,8 +39,6 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      
       // Prepare a small context of available thoughts for the AI
       const thoughtContext = thoughts.slice(0, 50).map(th => ({
         id: th.id,
@@ -49,27 +46,22 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
         expansive: th.content[language].expansive
       }));
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [...messages, userMsg].map(m => ({
-          role: m.role,
-          parts: [{ text: m.text }]
-        })),
-        config: {
-          systemInstruction: `You are the Oracle of MindGallery, a wise and compassionate guide. 
-          Your purpose is to help users transform limiting beliefs into expansive thoughts. 
-          Respond in ${language === 'es' ? 'Spanish' : language === 'de' ? 'German' : 'English'}.
-          Keep responses concise, poetic, and encouraging. 
-          
-          AVAILABLE THOUGHTS IN GALLERY:
-          ${JSON.stringify(thoughtContext)}
-
-          If you find a thought in the list that matches the user's situation, include its ID at the very end of your response in the format: [RECOMMEND: id]. 
-          Only recommend if it's a very strong match.`,
-        }
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, userMsg].map(m => ({
+            role: m.role === 'model' ? 'assistant' : 'user',
+            content: m.text
+          })),
+          language,
+          thoughtContext
+        })
       });
 
-      const fullText = response.text || "The Oracle is silent for now...";
+      if (!res.ok) throw new Error("Chat API failed");
+      const data = await res.json();
+      const fullText = data.text || "The Oracle is silent for now...";
       
       // Parse recommendation
       const recommendMatch = fullText.match(/\[RECOMMEND:\s*([^\]]+)\]/);

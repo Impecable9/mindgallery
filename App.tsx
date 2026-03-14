@@ -97,7 +97,10 @@ const App: React.FC = () => {
   const handleLogin = async () => {
     try {
       const res = await fetch('/api/auth/google/url');
+      if (!res.ok) throw new Error("API responded with error " + res.status);
       const { url } = await res.json();
+      if (!url) throw new Error("No URL returned from API");
+      
       const authWindow = window.open(url, 'google_auth', 'width=600,height=700');
       
       const handleMessage = (event: MessageEvent) => {
@@ -107,15 +110,20 @@ const App: React.FC = () => {
         }
       };
       window.addEventListener('message', handleMessage);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Login failed", e);
+      alert("Error al iniciar sesión: " + (e.message || "revisa la configuración del servidor"));
     }
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    setUser(null);
-    setUserThoughts([]);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
+      setUserThoughts([]);
+    } catch (e) {
+      console.error("Logout failed", e);
+    }
   };
 
   const handleLike = (id: string) => {

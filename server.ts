@@ -16,13 +16,25 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Firebase Admin
 try {
-  admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
-    projectId: "mind-gallery-app-2026",
-    storageBucket: "mind-gallery-app-2026.appspot.com" // Update bucket as per standard firebase, though we use the UI for now
-  });
-} catch (e) {
-  console.log("Firebase default init failed. Ensure GOOGLE_APPLICATION_CREDENTIALS is set, or running in a deployed environment.");
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    console.log("Found FIREBASE_SERVICE_ACCOUNT, attempting to parse...");
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      projectId: "mind-gallery-app-2026",
+      storageBucket: "mind-gallery-app-2026.appspot.com"
+    });
+    console.log("Firebase initialized with Service Account");
+  } else {
+    console.log("No FIREBASE_SERVICE_ACCOUNT found, using default credentials");
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+      projectId: "mind-gallery-app-2026",
+      storageBucket: "mind-gallery-app-2026.appspot.com"
+    });
+  }
+} catch (e: any) {
+  console.error("Firebase init failed detailed error:", e.message);
 }
 
 const db = admin.firestore();
@@ -33,6 +45,22 @@ const PORT = 3000;
   app.use(express.json());
   app.use(cookieParser());
 
+  // Debug endpoint
+  app.get("/api/debug", (req, res) => {
+    res.json({
+      timestamp: new Date().toISOString(),
+      url: req.url,
+      method: req.method,
+      env: {
+        HAS_FIREBASE: !!process.env.FIREBASE_SERVICE_ACCOUNT,
+        HAS_GROQ: !!process.env.GROQ_API_KEY,
+        HAS_GOOGLE_ID: !!process.env.GOOGLE_CLIENT_ID,
+        HAS_GOOGLE_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
+        APP_URL: process.env.APP_URL
+      }
+    });
+  });
+
   const client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET
@@ -42,7 +70,9 @@ const PORT = 3000;
   const sessions: Record<string, any> = {};
 
   app.get("/api/auth/google/url", (req, res) => {
-    const redirectUri = `${process.env.APP_URL}/api/auth/google/callback`;
+    const baseUrl = (process.env.APP_URL || "").replace(/\/$/, "");
+    const redirectUri = `${baseUrl}/api/auth/google/callback`;
+    console.log("Generating Auth URL with redirect_uri:", redirectUri);
     const url = client.generateAuthUrl({
       access_type: "offline",
       scope: ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"],
@@ -53,9 +83,11 @@ const PORT = 3000;
 
   app.get("/api/auth/google/callback", async (req, res) => {
     const { code } = req.query;
-    const redirectUri = `${process.env.APP_URL}/api/auth/google/callback`;
+    const baseUrl = (process.env.APP_URL || "").replace(/\/$/, "");
+    const redirectUri = `${baseUrl}/api/auth/google/callback`;
     
     try {
+      console.log("Auth callback received, exchanging code with redirect_uri:", redirectUri);
       const { tokens } = await client.getToken({
         code: code as string,
         redirect_uri: redirectUri,
@@ -468,6 +500,50 @@ const PORT = 3000;
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to save global config" });
+    }
+  });
+
+  // --- Groq Oracle Chat ---
+  app.post("/api/chat", async (req, res) => {
+    const { messages, language, thoughtContext } = req.body;
+    
+    try {
+      const response = await axios.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: `You are the Oracle of MindGallery, a wise and compassionate guide. 
+              Your purpose is to help users transform limiting beliefs into expansive thoughts. 
+              Respond in ${language === 'es' ? 'Spanish' : language === 'de' ? 'German' : 'English'}.
+              Keep responses concise, poetic, and encouraging. 
+              
+              AVAILABLE THOUGHTS IN GALLERY:
+              ${JSON.stringify(thoughtContext)}
+
+              If you find a thought in the list that matches the user's situation, include its ID at the very end of your response in the format: [RECOMMEND: id]. 
+              Only recommend if it's a very strong match.`
+            },
+            ...messages
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        },
+        {
+          headers: {
+            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      const fullText = response.data.choices[0].message.content;
+      res.json({ text: fullText });
+    } catch (error: any) {
+      console.error("Groq Chat Error:", error.response?.data || error.message);
+      res.status(500).json({ error: "The Oracle is momentarily disconnected." });
     }
   });
 
