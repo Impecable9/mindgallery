@@ -1,38 +1,161 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { X, ShoppingBag, Package, ChevronRight, Loader2, AlertCircle, Check, Globe, Image as ImageIcon } from 'lucide-react';
-import { Thought } from '../types';
+import React, { useState, useRef } from 'react';
+import { X, ShoppingBag, Package, ChevronRight, Loader2, AlertCircle, Check, Globe } from 'lucide-react';
+import { Thought, Language } from '../types';
 
-// ────────────────────────────────────────────────────────────
-//  Types
-// ────────────────────────────────────────────────────────────
-interface ProdigiProduct {
-  sku: string;
+// ── Types ──────────────────────────────────────────────────
+interface PurchaseModalProps {
+  thought: Thought;
+  imageUrl?: string;
+  onClose: () => void;
+  language: Language;
+}
+
+// ── Product Catalog (local, no API needed) ─────────────────
+interface Product {
+  id: string;
   name: string;
-  description?: string;
-  price?: number;
-  images?: string[];
-  attributes?: Record<string, string>;
+  desc: string;
+  price: number;
+  sku: string;
+  mockupimg: string;   // background photo of the product
+  mockupStyle: React.CSSProperties; // where to place the text overlay
+  textColor: string;
 }
 
-interface MockupResult {
-  mockupUrl?: string;
-  status?: string;
-}
+const PRODUCTS: Record<string, Product[]> = {
+  'Wall Prints': [
+    {
+      id: 'poster-a4', name: 'A4 Fine Art Print', desc: '210×297 mm · Archival paper', price: 35, sku: 'GLOBAL-FAP-A4',
+      mockupimg: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=700&q=80',
+      mockupStyle: { top: '12%', left: '22%', width: '56%', height: '66%' },
+      textColor: '#1e293b',
+    },
+    {
+      id: 'poster-a3', name: 'A3 Art Print', desc: '297×420 mm · Museum quality', price: 49, sku: 'GLOBAL-FAP-A3',
+      mockupimg: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=700&q=80',
+      mockupStyle: { top: '8%', left: '18%', width: '64%', height: '75%' },
+      textColor: '#1e293b',
+    },
+    {
+      id: 'poster-a2', name: 'A2 Premium Print', desc: '420×594 mm · Gallery grade', price: 65, sku: 'GLOBAL-FAP-A2',
+      mockupimg: 'https://images.unsplash.com/photo-1565372933718-e28f64f8099a?w=700&q=80',
+      mockupStyle: { top: '10%', left: '20%', width: '60%', height: '72%' },
+      textColor: '#1e293b',
+    },
+  ],
+  'Framed Art': [
+    {
+      id: 'frame-black-a4', name: 'A4 Framed – Black', desc: 'Ready to hang · Glass front', price: 55, sku: 'GLOBAL-FFAP-A4',
+      mockupimg: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=700&q=80',
+      mockupStyle: { top: '15%', left: '25%', width: '50%', height: '58%' },
+      textColor: '#1e293b',
+    },
+    {
+      id: 'frame-oak-a3', name: 'A3 Framed – Oak', desc: 'Solid wood · Warm tone', price: 89, sku: 'GLOBAL-FFAP-A3-OAK',
+      mockupimg: 'https://images.unsplash.com/photo-1576514419083-5e8e2bbd42b4?w=700&q=80',
+      mockupStyle: { top: '10%', left: '20%', width: '60%', height: '72%' },
+      textColor: '#1e293b',
+    },
+  ],
+  'Canvas': [
+    {
+      id: 'canvas-30', name: 'Canvas 30×30 cm', desc: 'Stretched · 38mm gallery wrap', price: 75, sku: 'GLOBAL-CAN-30',
+      mockupimg: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=700&q=80',
+      mockupStyle: { top: '8%', left: '12%', width: '76%', height: '76%' },
+      textColor: '#fff',
+    },
+    {
+      id: 'canvas-50', name: 'Canvas 50×50 cm', desc: 'Stretched · 38mm gallery wrap', price: 110, sku: 'GLOBAL-CAN-50',
+      mockupimg: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=700&q=80',
+      mockupStyle: { top: '5%', left: '8%', width: '84%', height: '84%' },
+      textColor: '#fff',
+    },
+  ],
+  'Clothing': [
+    {
+      id: 'tshirt', name: 'Organic T-Shirt', desc: 'S / M / L / XL · 100% organic', price: 32, sku: 'GLOBAL-TEE-PREM',
+      mockupimg: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=700&q=80',
+      mockupStyle: { top: '22%', left: '30%', width: '40%', height: '35%' },
+      textColor: '#1e293b',
+    },
+    {
+      id: 'hoodie', name: 'Premium Hoodie', desc: 'S / M / L / XL · Heavyweight', price: 55, sku: 'GLOBAL-HUD-PREM',
+      mockupimg: 'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&q=80',
+      mockupStyle: { top: '25%', left: '28%', width: '44%', height: '32%' },
+      textColor: '#fff',
+    },
+  ],
+  'Mugs': [
+    {
+      id: 'mug-11', name: 'Classic Mug 11oz', desc: '330 ml · Ceramic glossy', price: 18, sku: 'GLOBAL-MUG-11',
+      mockupimg: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=700&q=80',
+      mockupStyle: { top: '20%', left: '22%', width: '56%', height: '50%' },
+      textColor: '#1e293b',
+    },
+    {
+      id: 'mug-15', name: 'Large Mug 15oz', desc: '444 ml · Extra roomy', price: 22, sku: 'GLOBAL-MUG-15',
+      mockupimg: 'https://images.unsplash.com/photo-1510972527921-ce03766a1cf1?w=700&q=80',
+      mockupStyle: { top: '18%', left: '20%', width: '60%', height: '52%' },
+      textColor: '#1e293b',
+    },
+  ],
+  'Phone Cases': [
+    {
+      id: 'case-iphone', name: 'iPhone Case', desc: 'Tough · All modern models', price: 28, sku: 'GLOBAL-CASE-IP',
+      mockupimg: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=700&q=80',
+      mockupStyle: { top: '12%', left: '30%', width: '40%', height: '64%' },
+      textColor: '#fff',
+    },
+    {
+      id: 'case-android', name: 'Samsung Case', desc: 'S-Series · Drop protection', price: 28, sku: 'GLOBAL-CASE-SM',
+      mockupimg: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=700&q=80',
+      mockupStyle: { top: '10%', left: '28%', width: '44%', height: '70%' },
+      textColor: '#fff',
+    },
+  ],
+  'Stickers': [
+    {
+      id: 'sticker-single', name: 'Vinyl Sticker', desc: '10×10 cm ·Waterproof matte', price: 6, sku: 'GLOBAL-STK-S',
+      mockupimg: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=700&q=80',
+      mockupStyle: { top: '20%', left: '20%', width: '60%', height: '55%' },
+      textColor: '#1e293b',
+    },
+    {
+      id: 'sticker-pack', name: 'Sticker Pack ×5', desc: '8×8 cm each · Mixed finish', price: 18, sku: 'GLOBAL-STK-P',
+      mockupimg: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=700&q=80',
+      mockupStyle: { top: '15%', left: '15%', width: '70%', height: '60%' },
+      textColor: '#1e293b',
+    },
+  ],
+  'Notebooks': [
+    {
+      id: 'notebook-a5', name: 'Hardback Notebook A5', desc: '128 pages · Lined', price: 24, sku: 'GLOBAL-NB-A5',
+      mockupimg: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=700&q=80',
+      mockupStyle: { top: '15%', left: '18%', width: '64%', height: '70%' },
+      textColor: '#1e293b',
+    },
+  ],
+  'Postcards': [
+    {
+      id: 'postcard', name: 'Art Postcard A6', desc: '10.5×14.8 cm · 350gsm', price: 5, sku: 'GLOBAL-PC-S',
+      mockupimg: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=700&q=80',
+      mockupStyle: { top: '10%', left: '10%', width: '80%', height: '75%' },
+      textColor: '#1e293b',
+    },
+  ],
+};
 
-// ────────────────────────────────────────────────────────────
-//  Category definitions (ordered)
-// ────────────────────────────────────────────────────────────
-const CATEGORIES = [
-  { id: 'wall-art',  label: 'Wall Art',   icon: '🖼️',  query: 'fine-art' },
-  { id: 'canvas',   label: 'Canvas',     icon: '🎨',  query: 'canvas' },
-  { id: 'frames',   label: 'Framed',     icon: '🪞',  query: 'framed' },
-  { id: 'apparel',  label: 'Clothing',   icon: '👕',  query: 'apparel' },
-  { id: 'mugs',     label: 'Mugs',       icon: '☕',  query: 'mugs' },
-  { id: 'cases',    label: 'Phone Cases',icon: '📱',  query: 'phone-cases' },
-  { id: 'stickers', label: 'Stickers',   icon: '🎯',  query: 'stickers' },
-  { id: 'notebooks',label: 'Notebooks',  icon: '📓',  query: 'notebooks' },
-  { id: 'postcards',label: 'Postcards',  icon: '✉️',  query: 'postcards' },
-];
+const CATEGORY_ICONS: Record<string, string> = {
+  'Wall Prints': '🖼️',
+  'Framed Art': '🪞',
+  'Canvas': '🎨',
+  'Clothing': '👕',
+  'Mugs': '☕',
+  'Phone Cases': '📱',
+  'Stickers': '🎯',
+  'Notebooks': '📓',
+  'Postcards': '✉️',
+};
 
 const COUNTRIES = [
   { code: 'ES', name: 'Spain' },
@@ -48,161 +171,30 @@ const COUNTRIES = [
   { code: 'CH', name: 'Switzerland' },
 ];
 
-interface PurchaseModalProps {
-  thought: Thought;
-  imageUrl: string;
-  onClose: () => void;
-  language: string;
-}
-
-// ────────────────────────────────────────────────────────────
-//  Component
-// ────────────────────────────────────────────────────────────
-const PurchaseModal: React.FC<PurchaseModalProps> = ({ thought, imageUrl, onClose, language }) => {
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0].id);
-  const [products, setProducts] = useState<ProdigiProduct[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<ProdigiProduct | null>(null);
+// ── Component ──────────────────────────────────────────────
+const PurchaseModal: React.FC<PurchaseModalProps> = ({ thought, onClose, language }) => {
+  const categories = Object.keys(PRODUCTS);
+  const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [countryCode, setCountryCode] = useState('ES');
-  const [shippingPrice, setShippingPrice] = useState<number | null>(null);
-  const [mockupUrl, setMockupUrl] = useState<string | null>(null);
-  const [loadingProducts, setLoadingProducts] = useState(false);
-  const [loadingMockup, setLoadingMockup] = useState(false);
-  const [loadingShipping, setLoadingShipping] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
-  const mockupTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const thoughtText = thought.content[language]?.expansive || thought.content['en'].expansive;
+  const products = PRODUCTS[activeCategory] || [];
 
-  // Fallback product list keyed by category when Prodigi API returns nothing
-  const FALLBACK_PRODUCTS: Record<string, ProdigiProduct[]> = {
-    'wall-art': [
-      { sku: 'GLOBAL-FAP-A4', name: 'Fine Art Print A4', description: '210 × 297 mm · Archival paper', price: 35 },
-      { sku: 'GLOBAL-FAP-A3', name: 'Fine Art Print A3', description: '297 × 420 mm · Archival paper', price: 49 },
-      { sku: 'GLOBAL-FAP-A2', name: 'Fine Art Print A2', description: '420 × 594 mm · Archival paper', price: 65 },
-    ],
-    'canvas': [
-      { sku: 'GLOBAL-CAN-30', name: 'Canvas 30×30 cm', description: '38mm deep frame', price: 75 },
-      { sku: 'GLOBAL-CAN-50', name: 'Canvas 50×50 cm', description: '38mm deep frame', price: 110 },
-    ],
-    'frames': [
-      { sku: 'GLOBAL-FFAP-A4', name: 'A4 Framed (Black)', description: 'Ready to hang', price: 55 },
-      { sku: 'GLOBAL-FFAP-A3', name: 'A3 Framed (Oak)', description: 'Solid wood · glass', price: 89 },
-    ],
-    'apparel': [
-      { sku: 'GLOBAL-TEE-PREM', name: 'Premium T-Shirt', description: 'S / M / L / XL', price: 32 },
-      { sku: 'GLOBAL-HUD-PREM', name: 'Luxury Hoodie', description: 'S / M / L / XL', price: 55 },
-    ],
-    'mugs': [
-      { sku: 'GLOBAL-MUG-11', name: 'Classic Mug 11oz', description: '330 ml · White glossy', price: 18 },
-      { sku: 'GLOBAL-MUG-15', name: 'Large Mug 15oz', description: '444 ml · White glossy', price: 22 },
-    ],
-    'cases': [
-      { sku: 'GLOBAL-CASE-IP', name: 'iPhone Case', description: 'Tough · All models', price: 28 },
-      { sku: 'GLOBAL-CASE-SM', name: 'Samsung Case', description: 'S-Series · Impact resistant', price: 28 },
-    ],
-    'stickers': [
-      { sku: 'GLOBAL-STK-S', name: 'Single Sticker', description: '10×10 cm · Vinyl matte', price: 6 },
-      { sku: 'GLOBAL-STK-P', name: 'Collector Pack ×5', description: '8×8 cm each · Vinyl matte', price: 18 },
-    ],
-    'notebooks': [
-      { sku: 'GLOBAL-NB-A5', name: 'Hardback Notebook A5', description: '128 pages · Ruled', price: 24 },
-    ],
-    'postcards': [
-      { sku: 'GLOBAL-PC-S', name: 'Art Postcard A6', description: '10.5 × 14.8 cm · 350gsm', price: 5 },
-    ],
-  };
+  // Shipping cost estimate by category
+  const shippingCost = (() => {
+    const cat = activeCategory;
+    if (cat === 'Postcards' || cat === 'Stickers') return 3.5;
+    if (cat === 'Clothing') return 8;
+    if (cat === 'Wall Prints' || cat === 'Framed Art' || cat === 'Canvas') return 12;
+    return 6;
+  })();
 
-  // ── Fetch product list when category changes ──
-  useEffect(() => {
-    const cat = CATEGORIES.find(c => c.id === activeCategory);
-    if (!cat) return;
+  const totalPrice = selectedProduct ? selectedProduct.price + shippingCost : 0;
 
-    setProducts([]);
-    setSelectedProduct(null);
-    setMockupUrl(null);
-    setShippingPrice(null);
-    setError(null);
-    setLoadingProducts(true);
-
-    fetch(`/api/products?category=${cat.query}`)
-      .then(r => r.json())
-      .then(data => {
-        const list: ProdigiProduct[] = Array.isArray(data.products) && data.products.length
-          ? data.products.slice(0, 12)
-          : FALLBACK_PRODUCTS[activeCategory] || [];
-        setProducts(list);
-      })
-      .catch(() => {
-        setProducts(FALLBACK_PRODUCTS[activeCategory] || []);
-      })
-      .finally(() => setLoadingProducts(false));
-  }, [activeCategory]);
-
-  // ── Generate mockup when product selected ──
-  const generateMockup = useCallback(async (product: ProdigiProduct) => {
-    setMockupUrl(null);
-    setLoadingMockup(true);
-    clearTimeout(mockupTimeoutRef.current);
-
-    try {
-      const res = await fetch('/api/mockup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sku: product.sku, imageUrl }),
-      });
-      const data: MockupResult = await res.json();
-      if (data.mockupUrl) {
-        setMockupUrl(data.mockupUrl);
-      } else {
-        // Mockup generation may be async; poll after 3s
-        mockupTimeoutRef.current = setTimeout(() => {
-          setMockupUrl(imageUrl); // fallback to original image
-          setLoadingMockup(false);
-        }, 3000);
-        return;
-      }
-    } catch {
-      setMockupUrl(imageUrl); // graceful fallback
-    } finally {
-      setLoadingMockup(false);
-    }
-  }, [imageUrl]);
-
-  // ── Fetch shipping quote ──
-  const fetchShipping = useCallback(async (sku: string, country: string) => {
-    setLoadingShipping(true);
-    setShippingPrice(null);
-    try {
-      const res = await fetch('/api/shipping/quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sku, countryCode: country }),
-      });
-      const data = await res.json();
-      const cost = data?.quotes?.[0]?.shipments?.[0]?.cost?.amount;
-      setShippingPrice(cost != null ? parseFloat(cost) : 0);
-    } catch {
-      setShippingPrice(0);
-    } finally {
-      setLoadingShipping(false);
-    }
-  }, []);
-
-  // Select product handler
-  const handleSelectProduct = (product: ProdigiProduct) => {
-    setSelectedProduct(product);
-    generateMockup(product);
-    fetchShipping(product.sku, countryCode);
-  };
-
-  // Country change refreshes shipping
-  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const code = e.target.value;
-    setCountryCode(code);
-    if (selectedProduct) fetchShipping(selectedProduct.sku, code);
-  };
-
-  // Checkout
   const handleCheckout = async () => {
     if (!selectedProduct) return;
     setCheckingOut(true);
@@ -215,10 +207,10 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ thought, imageUrl, onClos
           thoughtId: thought.id,
           sku: selectedProduct.sku,
           productName: selectedProduct.name,
-          price: selectedProduct.price ?? 0,
-          shippingPrice: shippingPrice ?? 0,
+          price: selectedProduct.price,
+          shippingPrice: shippingCost,
           countryCode,
-          imageUrl,
+          imageUrl: `https://mindgallery.vercel.app/api/render-thought?id=${thought.id}`,
         }),
       });
       const data = await res.json();
@@ -234,107 +226,105 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ thought, imageUrl, onClos
     }
   };
 
-  const totalPrice = (selectedProduct?.price ?? 0) + (shippingPrice ?? 0);
-
-  // ────────────────────────────────────────────────────────────
-  //  Render
-  // ────────────────────────────────────────────────────────────
   return (
     <div className="purchase-modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="purchase-modal">
-        {/* Header */}
+
+        {/* ── Header ── */}
         <div className="purchase-modal-header">
           <div>
             <h2 className="purchase-modal-title">
-              <ShoppingBag size={20} style={{ display: 'inline', marginRight: 8 }} />
+              <ShoppingBag size={20} />
               Customize Your Order
             </h2>
-            <p className="purchase-modal-subtitle" style={{ opacity: 0.6, fontSize: 13, marginTop: 4 }}>
-              "{thought.text.substring(0, 60)}{thought.text.length > 60 ? '...' : ''}"
+            <p className="purchase-modal-subtitle">
+              "{thoughtText.substring(0, 65)}{thoughtText.length > 65 ? '…' : ''}"
             </p>
           </div>
           <button className="purchase-modal-close" onClick={onClose}><X size={20} /></button>
         </div>
 
+        {/* ── Body ── */}
         <div className="purchase-modal-body">
+
           {/* Left: Categories + Products */}
           <div className="purchase-modal-panel purchase-modal-left">
-            {/* Category tabs */}
             <div className="prodigi-categories">
-              {CATEGORIES.map(cat => (
+              {categories.map(cat => (
                 <button
-                  key={cat.id}
-                  className={`prodigi-cat-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                  onClick={() => setActiveCategory(cat.id)}
+                  key={cat}
+                  className={`prodigi-cat-btn ${activeCategory === cat ? 'active' : ''}`}
+                  onClick={() => { setActiveCategory(cat); setSelectedProduct(null); }}
                 >
-                  <span className="prodigi-cat-icon">{cat.icon}</span>
-                  <span className="prodigi-cat-label">{cat.label}</span>
-                  {activeCategory === cat.id && <ChevronRight size={14} className="prodigi-cat-arrow" />}
+                  <span className="prodigi-cat-icon">{CATEGORY_ICONS[cat]}</span>
+                  <span className="prodigi-cat-label">{cat}</span>
+                  {activeCategory === cat && <ChevronRight size={14} className="prodigi-cat-arrow" />}
                 </button>
               ))}
             </div>
 
-            {/* Product list */}
             <div className="prodigi-product-list">
-              {loadingProducts ? (
-                <div className="prodigi-loading">
-                  <Loader2 className="spin" size={24} />
-                  <span>Loading products…</span>
-                </div>
-              ) : products.length === 0 ? (
-                <p className="prodigi-empty">No products found for this category.</p>
-              ) : (
-                products.map(product => (
-                  <button
-                    key={product.sku}
-                    className={`prodigi-product-card ${selectedProduct?.sku === product.sku ? 'selected' : ''}`}
-                    onClick={() => handleSelectProduct(product)}
-                  >
-                    <div className="prodigi-product-info">
-                      <span className="prodigi-product-name">{product.name}</span>
-                      <span className="prodigi-product-desc">{product.description}</span>
-                    </div>
-                    <div className="prodigi-product-price">
-                      {product.price != null ? `€${product.price}` : '—'}
-                      {selectedProduct?.sku === product.sku && <Check size={14} className="prodigi-check" />}
-                    </div>
-                  </button>
-                ))
-              )}
+              {products.map(product => (
+                <button
+                  key={product.id}
+                  className={`prodigi-product-card ${selectedProduct?.id === product.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedProduct(product)}
+                >
+                  <div className="prodigi-product-info">
+                    <span className="prodigi-product-name">{product.name}</span>
+                    <span className="prodigi-product-desc">{product.desc}</span>
+                  </div>
+                  <div className="prodigi-product-price">
+                    €{product.price}
+                    {selectedProduct?.id === product.id && <Check size={14} className="prodigi-check" />}
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Right: Preview + Shipping + Checkout */}
+          {/* Right: Live Mockup + Checkout */}
           <div className="purchase-modal-panel purchase-modal-right">
-            {/* Mockup preview */}
+
+            {/* Live Mockup Preview */}
             <div className="prodigi-mockup-area">
               {selectedProduct ? (
-                loadingMockup ? (
-                  <div className="prodigi-mockup-loading">
-                    <Loader2 className="spin" size={32} />
-                    <p>Generating preview…</p>
+                <div className="prodigi-live-mockup">
+                  {/* Product background image */}
+                  <img
+                    src={selectedProduct.mockupimg}
+                    alt={selectedProduct.name}
+                    className="prodigi-mockup-bg"
+                    crossOrigin="anonymous"
+                  />
+                  {/* Text overlay on the product */}
+                  <div
+                    className="prodigi-text-overlay"
+                    style={{
+                      ...selectedProduct.mockupStyle,
+                      color: selectedProduct.textColor,
+                    }}
+                  >
+                    <p className="prodigi-overlay-text">{thoughtText}</p>
+                    <p className="prodigi-overlay-brand">— Mind Gallery</p>
                   </div>
-                ) : mockupUrl ? (
-                  <img src={mockupUrl} alt="Product mockup" className="prodigi-mockup-img" />
-                ) : (
-                  <img src={imageUrl} alt="Art preview" className="prodigi-mockup-img" />
-                )
+                </div>
               ) : (
                 <div className="prodigi-mockup-placeholder">
-                  <ImageIcon size={48} style={{ opacity: 0.3 }} />
-                  <p>Select a product<br />to see your art on it</p>
+                  <span style={{ fontSize: 48 }}>{CATEGORY_ICONS[activeCategory]}</span>
+                  <p>Select a product<br />to preview your thought on it</p>
                 </div>
               )}
             </div>
 
-            {/* Shipping + Country */}
+            {/* Shipping + Checkout */}
             {selectedProduct && (
               <div className="prodigi-shipping-section">
                 <div className="prodigi-country-row">
                   <Globe size={16} />
                   <select
                     value={countryCode}
-                    onChange={handleCountryChange}
+                    onChange={e => setCountryCode(e.target.value)}
                     className="prodigi-country-select"
                   >
                     {COUNTRIES.map(c => (
@@ -345,14 +335,12 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ thought, imageUrl, onClos
 
                 <div className="prodigi-price-breakdown">
                   <div className="prodigi-price-row">
-                    <span>Product</span>
-                    <span>€{selectedProduct.price?.toFixed(2) ?? '—'}</span>
+                    <span>{selectedProduct.name}</span>
+                    <span>€{selectedProduct.price.toFixed(2)}</span>
                   </div>
                   <div className="prodigi-price-row">
-                    <span>Shipping</span>
-                    <span>
-                      {loadingShipping ? <Loader2 size={14} className="spin" /> : shippingPrice != null ? `€${shippingPrice.toFixed(2)}` : '—'}
-                    </span>
+                    <span>Shipping to {COUNTRIES.find(c => c.code === countryCode)?.name}</span>
+                    <span>€{shippingCost.toFixed(2)}</span>
                   </div>
                   <div className="prodigi-price-row prodigi-price-total">
                     <span>Total</span>
@@ -369,7 +357,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ thought, imageUrl, onClos
                 <button
                   className="prodigi-checkout-btn"
                   onClick={handleCheckout}
-                  disabled={checkingOut || loadingShipping}
+                  disabled={checkingOut}
                 >
                   {checkingOut ? (
                     <><Loader2 className="spin" size={16} /> Processing…</>
@@ -379,7 +367,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ thought, imageUrl, onClos
                 </button>
 
                 <p className="prodigi-legal">
-                  Fulfilled by Prodigi. Ships worldwide. 100% satisfaction guarantee.
+                  Fulfilled by Prodigi. Ships worldwide. Free returns within 30 days.
                 </p>
               </div>
             )}
