@@ -1,6 +1,6 @@
 import React from 'react';
-import { CategoryType, Thought, ThemeConfig, TextColor, FrameColor, LogoStyle, ArtStyle, Language } from './types';
-import { Heart, DollarSign, Zap, Crown, Star, Infinity, Feather, CircleOff, BookOpen, Cpu, Shield, Users, Scale } from 'lucide-react';
+import { CategoryType, Thought, ThemeConfig, TextColor, FrameColor, LogoStyle, ArtStyle, Language, ProductCatalog } from './types';
+import { Heart, DollarSign, Zap, Crown, Star, Infinity, Feather, CircleOff, BookOpen, Cpu, Shield, Users, Scale, Image, Box, Frame } from 'lucide-react';
 import { ADDITIONAL_THOUGHTS } from './src/data/thoughts';
 import { ADDITIONAL_THOUGHTS_2 } from './src/data/thoughts_2';
 import { POLITICAL_AI_THOUGHTS } from './src/data/political_ai_thoughts';
@@ -8,6 +8,67 @@ import { BULK_THOUGHTS_1 } from './src/data/bulk_thoughts_1';
 import { BULK_THOUGHTS_2 } from './src/data/bulk_thoughts_2';
 import { BULK_THOUGHTS_3 } from './src/data/bulk_thoughts_3';
 import { EMOTIONS_THOUGHTS } from './src/data/emotions_thoughts';
+
+export const PRODUCT_CATALOG: ProductCatalog = {
+  stickers: {
+    name: "Stickers & Decals",
+    description: "Vinyl, water-resistant, matte finish. Perfect for laptops and notebooks.",
+    variants: [
+      { id: 'stk-s', sku: 'GLOBAL-STK-S', name: 'Single Sticker', size: '10x10 cm', price: 6 },
+      { id: 'stk-p', sku: 'GLOBAL-STK-P', name: 'Collector Pack (5)', size: '8x8 cm each', price: 18 },
+    ]
+  },
+  stationery: {
+    name: "Stationery",
+    description: "Personalized notebooks and postcards with premium paper.",
+    variants: [
+      { id: 'pc-s', sku: 'GLOBAL-PC-S', name: 'Art Postcard', size: 'A6 (10.5x14.8 cm)', price: 5 },
+      { id: 'nb-a5', sku: 'GLOBAL-NB-A5', name: 'Hardback Notebook', size: 'A5 (128 pages)', price: 24 },
+    ]
+  },
+  tech: {
+    name: "Tech Accessories",
+    description: "Impact-resistant cases to protect your device with art.",
+    variants: [
+      { id: 'case-iphone', sku: 'GLOBAL-CASE-IP', name: 'iPhone Case', size: 'All Models (Protective)', price: 28 },
+      { id: 'case-samsung', sku: 'GLOBAL-CASE-SM', name: 'Samsung Case', size: 'All S-Series (Protective)', price: 28 },
+    ]
+  },
+  apparel: {
+    name: "Wearable Art",
+    description: "Eco-friendly organic cotton with high-fidelity digital printing.",
+    variants: [
+      { id: 'tee-premium', sku: 'GLOBAL-TEE-PREM', name: 'Premium T-Shirt', size: 'S / M / L / XL', price: 32 },
+      { id: 'hoodie-premium', sku: 'GLOBAL-HUD-PREM', name: 'Luxury Hoodie', size: 'S / M / L / XL', price: 55 },
+    ]
+  },
+  prints: {
+    name: "Art Prints",
+    description: "Unframed Giclée prints on museum-quality paper.",
+    variants: [
+      { id: 'eco-a4', sku: 'GLOBAL-ECO-A4', name: 'Economy Poster', size: 'A4 (170gsm)', price: 18 },
+      { id: 'print-a4', sku: 'GLOBAL-FAP-A4', name: 'Fine Art Print', size: 'A4 (200gsm)', price: 35 },
+      { id: 'print-a3', sku: 'GLOBAL-FAP-A3', name: 'Exhibition Print', size: 'A3 (200gsm)', price: 49 },
+    ]
+  },
+  framed: {
+    name: "Framed Fine Art",
+    description: "Choose your frame style. Ready to hang.",
+    variants: [
+      { id: 'framed-a4-eco', sku: 'GLOBAL-FR-A4-ECO', name: 'A4 Basic Frame', size: 'Black (Simple)', price: 55 },
+      { id: 'framed-a4-lux', sku: 'GLOBAL-FR-A4-LUX', name: 'A4 Gallery Frame', size: 'Solid Oak / Glass', price: 89 },
+      { id: 'framed-a3-lux', sku: 'GLOBAL-FR-A3-LUX', name: 'A3 Gallery Frame', size: 'Solid Oak / Glass', price: 125 },
+    ]
+  },
+  canvas: {
+    name: "Canvas Prints",
+    description: "Hand-stretched canvas over professional wooden frames.",
+    variants: [
+      { id: 'canvas-30', sku: 'GLOBAL-CAN-30', name: 'Square Canvas', size: '30 x 30 cm', price: 75 },
+      { id: 'canvas-50', sku: 'GLOBAL-CAN-50', name: 'Large Square Canvas', size: '50 x 50 cm', price: 110 },
+    ]
+  }
+};
 
 export const UI_TRANSLATIONS = {
   en: {

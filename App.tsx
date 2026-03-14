@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layers, Grid, Info, Search, Type, Palette, AlignLeft, AlignCenter, AlignRight, Check, Moon, Sun, CloudLightning, Sparkles, ChevronDown, Globe, Dices, LogIn, LogOut, Plus, MessageSquare } from 'lucide-react';
+import { Layers, Grid, Info, Search, Type, Palette, AlignLeft, AlignCenter, AlignRight, Check, Moon, Sun, CloudLightning, Sparkles, ChevronDown, Globe, Dices, MessageSquare, ShoppingBag } from 'lucide-react';
 import { CategoryType, AspectRatio, Thought, StyleConfig, FontFamily, TextColor, TextAlign, Language } from './types';
 import { THOUGHTS_DATA, CATEGORY_THEMES, COLOR_MAP, UI_TRANSLATIONS } from './constants';
 import ThoughtCard from './components/ThoughtCard';
@@ -26,10 +26,6 @@ const App: React.FC = () => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Auth State
-  const [user, setUser] = useState<any>(null);
-  const [userThoughts, setUserThoughts] = useState<Thought[]>([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [thoughtToPurchase, setThoughtToPurchase] = useState<Thought | null>(null);
   
@@ -53,78 +49,8 @@ const App: React.FC = () => {
   const [likes, setLikes] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    checkAuth();
-    fetchGlobalConfig();
+    // No auth needed — public gallery
   }, []);
-
-  const fetchGlobalConfig = async () => {
-    try {
-      const res = await fetch('/api/config/global');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.config) setGlobalConfig(data.config);
-      }
-    } catch (e) {
-      console.error("Failed to fetch global config");
-    }
-  };
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-        fetchUserThoughts();
-      }
-    } catch (e) {
-      console.error("Auth check failed", e);
-    }
-  };
-
-  const fetchUserThoughts = async () => {
-    try {
-      const res = await fetch('/api/thoughts/user');
-      if (res.ok) {
-        const data = await res.json();
-        setUserThoughts(data.thoughts);
-      }
-    } catch (e) {
-      console.error("Fetch user thoughts failed", e);
-    }
-  };
-
-  const handleLogin = async () => {
-    try {
-      const res = await fetch('/api/auth/google/url');
-      if (!res.ok) throw new Error("API responded with error " + res.status);
-      const { url } = await res.json();
-      if (!url) throw new Error("No URL returned from API");
-      
-      const authWindow = window.open(url, 'google_auth', 'width=600,height=700');
-      
-      const handleMessage = (event: MessageEvent) => {
-        if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-          checkAuth();
-          window.removeEventListener('message', handleMessage);
-        }
-      };
-      window.addEventListener('message', handleMessage);
-    } catch (e: any) {
-      console.error("Login failed", e);
-      alert("Error al iniciar sesión: " + (e.message || "revisa la configuración del servidor"));
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
-      setUserThoughts([]);
-    } catch (e) {
-      console.error("Logout failed", e);
-    }
-  };
 
   const handleLike = (id: string) => {
     setLikes(prev => ({
@@ -135,7 +61,7 @@ const App: React.FC = () => {
 
   // Filter thoughts
   const filteredThoughts = useMemo(() => {
-    let thoughts = [...THOUGHTS_DATA, ...userThoughts];
+    let thoughts = [...THOUGHTS_DATA];
     
     if (selectedCategory !== 'ALL') {
       thoughts = thoughts.filter(t => t.category === selectedCategory);
@@ -155,7 +81,7 @@ const App: React.FC = () => {
     }
 
     return thoughts;
-  }, [selectedCategory, selectedEmotion, searchQuery, language, userThoughts]);
+  }, [selectedCategory, selectedEmotion, searchQuery, language]);
 
   // Derive unique emotions for the filter
   const emotionTags = useMemo(() => {
@@ -264,44 +190,17 @@ const App: React.FC = () => {
                <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">{t.navChat}</span>
              </button>
 
-             {/* Add Thought Button (Logged In) */}
-             {user && (
-               <button
-                 onClick={() => setIsAddModalOpen(true)}
-                 className={`p-2 rounded-full transition-all border flex items-center gap-2 px-3 ${
-                   isNegativeMode ? 'bg-emerald-900/20 text-emerald-300 border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                 }`}
-               >
-                 <Plus size={18} />
-                 <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">{t.navAddThought}</span>
-               </button>
-             )}
-
-             {/* Auth Button */}
-             {user ? (
-               <div className="flex items-center gap-2">
-                 {user.isAdmin ? (
-                   <button onClick={() => setViewMode('DASHBOARD')} title="Panel de Control (Admin)" className="hover:scale-105 transition-transform">
-                     <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-white/20 ring-2 ring-emerald-500" />
-                   </button>
-                 ) : (
-                   <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-white/20" title="Sesión iniciada" />
-                 )}
-                 <button onClick={handleLogout} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                   <LogOut size={18} />
-                 </button>
-               </div>
-             ) : (
-               <button
-                 onClick={handleLogin}
-                 className={`p-2 rounded-full transition-all border flex items-center gap-2 px-3 ${
-                   isNegativeMode ? 'bg-white/10 text-white border-white/20' : 'bg-white/50 text-slate-600 border-white/40'
-                 }`}
-               >
-                 <LogIn size={18} />
-                 <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">{t.navLogin}</span>
-               </button>
-             )}
+             {/* Shop Button */}
+             <button
+               onClick={() => { if (thoughtToPurchase) setIsPurchaseModalOpen(true); }}
+               title="Open Shop"
+               className={`p-2 rounded-full transition-all border flex items-center gap-2 px-3 ${
+                 isNegativeMode ? 'bg-white/10 text-white border-white/20' : 'bg-white/50 text-slate-600 border-white/40'
+               }`}
+             >
+               <ShoppingBag size={18} />
+               <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">Shop</span>
+             </button>
 
              {/* ROULETTE BUTTON - PRO MAX */}
              <div className="hidden sm:block">
@@ -596,14 +495,6 @@ const App: React.FC = () => {
               setViewMode('GALLERY');
             }}
           />
-        ) : viewMode === 'DASHBOARD' && user ? (
-          <Dashboard 
-             user={user} 
-             language={language} 
-             isNegativeMode={isNegativeMode} 
-             globalConfig={globalConfig} 
-             onGlobalConfigUpdate={fetchGlobalConfig} 
-          />
         ) : null}
       </main>
 
@@ -631,24 +522,14 @@ const App: React.FC = () => {
          language={language}
       />
 
-      {/* Add Thought Modal */}
-      <AddThoughtModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        language={language}
-        isNegativeMode={isNegativeMode}
-        onSuccess={() => {
-          fetchUserThoughts();
-          setIsAddModalOpen(false);
-        }}
-      />
-
-      <PurchaseModal
-        isOpen={isPurchaseModalOpen}
-        onClose={() => setIsPurchaseModalOpen(false)}
-        thought={thoughtToPurchase}
-        language={language}
-      />
+      {isPurchaseModalOpen && thoughtToPurchase && (
+        <PurchaseModal
+          thought={thoughtToPurchase}
+          imageUrl={`/api/render-thought?id=${thoughtToPurchase.id}`}
+          onClose={() => setIsPurchaseModalOpen(false)}
+          language={language}
+        />
+      )}
 
     </div>
   );

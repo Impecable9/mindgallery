@@ -1,589 +1,323 @@
 import express from "express";
-import cookieParser from "cookie-parser";
-import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
 import axios from "axios";
-import * as admin from "firebase-admin";
-import Parser from "rss-parser";
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Initialize Firebase Admin safely for Serverless
-try {
-  if (!admin.apps.length) {
-    const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (saRaw) {
-      console.log("Found FIREBASE_SERVICE_ACCOUNT, attempting to parse...");
-      try {
-        // Handle potential double-quoting or escaping issues from Vercel UI
-        let saJson = saRaw.trim();
-        if (saJson.startsWith("'") && saJson.endsWith("'")) saJson = saJson.slice(1, -1);
-        if (saJson.startsWith('"') && saJson.endsWith('"')) saJson = saJson.slice(1, -1);
-        
-        const serviceAccount = JSON.parse(saJson);
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-          projectId: "mind-gallery-app-2026",
-          storageBucket: "mind-gallery-app-2026.appspot.com"
-        });
-        console.log("Firebase initialized successfully with Service Account");
-      } catch (parseError: any) {
-        console.error("CRITICAL: Failed to parse FIREBASE_SERVICE_ACCOUNT. Trace:", parseError.message);
-      }
-    } else {
-      console.log("No FIREBASE_SERVICE_ACCOUNT found, using environment default credentials...");
-      admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
-        projectId: "mind-gallery-app-2026",
-        storageBucket: "mind-gallery-app-2026.appspot.com"
-      });
-    }
-  } else {
-    console.log("Firebase already initialized, skipping...");
-  }
-} catch (e: any) {
-  console.error("Firebase overall initialization failure:", e.message);
-}
-
-const db = admin.firestore();
-
 const app = express();
 const PORT = 3000;
 
-  app.use(express.json());
-  app.use(cookieParser());
+app.use(express.json());
 
-  // Debug endpoint
-  app.get("/api/debug", (req, res) => {
-    res.json({
-      timestamp: new Date().toISOString(),
-      url: req.url,
-      method: req.method,
-      env: {
-        HAS_FIREBASE: !!process.env.FIREBASE_SERVICE_ACCOUNT,
-        HAS_GROQ: !!process.env.GROQ_API_KEY,
-        HAS_GOOGLE_ID: !!process.env.GOOGLE_CLIENT_ID,
-        HAS_GOOGLE_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
-        APP_URL: process.env.APP_URL
+// --- Prodigi API ---
+const PRODIGI_API_URL = "https://api.prodigi.com/v4.0";
+const PRODIGI_API_KEY = process.env.PRODIGI_API_KEY!;
+
+// --- Stripe ---
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-02-11-preview",
+});
+
+// --- Debug endpoint ---
+app.get("/api/debug", (req, res) => {
+  res.json({
+    timestamp: new Date().toISOString(),
+    env: {
+      HAS_STRIPE: !!process.env.STRIPE_SECRET_KEY,
+      HAS_PRODIGI: !!process.env.PRODIGI_API_KEY,
+      HAS_GROQ: !!process.env.GROQ_API_KEY,
+      APP_URL: process.env.APP_URL,
+    },
+  });
+});
+
+// --- Prodigi: Get product catalog by category ---
+// GET /api/products?category=hoodies&page=1
+app.get("/api/products", async (req, res) => {
+  const { category, page = "1", limit = "20" } = req.query;
+  try {
+    const params: Record<string, string> = {
+      page: page as string,
+      pageSize: limit as string,
+    };
+    if (category) params.category = category as string;
+
+    const response = await axios.get(`${PRODIGI_API_URL}/products`, {
+      headers: {
+        "X-API-Key": PRODIGI_API_KEY,
+        "Content-Type": "application/json",
+      },
+      params,
+    });
+
+    res.json(response.data);
+  } catch (error: any) {
+    console.error("Prodigi Products Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to fetch Prodigi products" });
+  }
+});
+
+// --- Prodigi: Get single product details by SKU ---
+// GET /api/products/:sku
+app.get("/api/products/:sku", async (req, res) => {
+  const { sku } = req.params;
+  try {
+    const response = await axios.get(`${PRODIGI_API_URL}/products/${sku}`, {
+      headers: {
+        "X-API-Key": PRODIGI_API_KEY,
+        "Content-Type": "application/json",
+      },
+    });
+    res.json(response.data);
+  } catch (error: any) {
+    console.error("Prodigi Product Detail Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to fetch product details" });
+  }
+});
+
+// --- Prodigi: Generate Mockup for a product + artwork image ---
+// POST /api/mockup
+// Body: { sku: string, imageUrl: string, text?: string }
+app.post("/api/mockup", async (req, res) => {
+  const { sku, imageUrl } = req.body;
+
+  if (!sku || !imageUrl) {
+    return res.status(400).json({ error: "sku and imageUrl are required" });
+  }
+
+  try {
+    // Prodigi Mockup API endpoint (v4)
+    const response = await axios.post(
+      `${PRODIGI_API_URL}/mockups`,
+      {
+        sku,
+        assets: [
+          {
+            printArea: "default",
+            url: imageUrl,
+          },
+        ],
+      },
+      {
+        headers: {
+          "X-API-Key": PRODIGI_API_KEY,
+          "Content-Type": "application/json",
+        },
       }
-    });
-  });
+    );
 
-  const client = new OAuth2Client(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET
-  );
+    res.json(response.data);
+  } catch (error: any) {
+    console.error("Prodigi Mockup Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to generate mockup" });
+  }
+});
 
-  // In-memory sessions
-  const sessions: Record<string, any> = {};
+// --- Prodigi: Shipping quote ---
+// POST /api/shipping/quote
+app.post("/api/shipping/quote", async (req, res) => {
+  const { countryCode, sku } = req.body;
+  try {
+    const response = await axios.post(
+      `${PRODIGI_API_URL}/quotes`,
+      {
+        destinationCountryCode: countryCode,
+        items: [{ sku, quantity: 1 }],
+      },
+      {
+        headers: {
+          "X-API-Key": PRODIGI_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error: any) {
+    console.error("Prodigi Quote Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to fetch shipping quote" });
+  }
+});
 
-  app.get("/api/auth/google/url", (req, res) => {
-    const baseUrl = (process.env.APP_URL || "").replace(/\/$/, "");
-    const redirectUri = `${baseUrl}/api/auth/google/callback`;
-    console.log("Generating Auth URL with redirect_uri:", redirectUri);
-    const url = client.generateAuthUrl({
-      access_type: "offline",
-      scope: ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"],
-      redirect_uri: redirectUri,
-    });
-    res.json({ url });
-  });
+// --- Stripe: Create checkout session ---
+// POST /api/checkout/create-session
+app.post("/api/checkout/create-session", async (req, res) => {
+  const { thoughtId, sku, productName, price, shippingPrice, countryCode, imageUrl } = req.body;
 
-  app.get("/api/auth/google/callback", async (req, res) => {
-    const { code } = req.query;
-    const baseUrl = (process.env.APP_URL || "").replace(/\/$/, "");
-    const redirectUri = `${baseUrl}/api/auth/google/callback`;
-    
-    try {
-      console.log("Auth callback received, exchanging code with redirect_uri:", redirectUri);
-      const { tokens } = await client.getToken({
-        code: code as string,
-        redirect_uri: redirectUri,
-      });
-      
-      const ticket = await client.verifyIdToken({
-        idToken: tokens.id_token!,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-      
-      const payload = ticket.getPayload();
-      if (!payload) throw new Error("No payload");
-
-      const sessionId = Math.random().toString(36).substring(7);
-      sessions[sessionId] = {
-        id: payload.sub,
-        name: payload.name,
-        email: payload.email,
-        picture: payload.picture,
-      };
-
-      res.cookie("sessionId", sessionId, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      });
-
-      res.send(`
-        <html>
-          <body>
-            <script>
-              if (window.opener) {
-                window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
-                window.close();
-              } else {
-                window.location.href = '/';
-              }
-            </script>
-            <p>Authentication successful. This window should close automatically.</p>
-          </body>
-        </html>
-      `);
-    } catch (error) {
-      console.error("Auth error:", error);
-      res.status(500).send("Authentication failed");
-    }
-  });
-
-  app.get("/api/auth/me", (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (user) {
-      const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-      const isAdmin = adminEmails.includes(user.email);
-      res.json({ user: { ...user, isAdmin } });
-    } else {
-      res.status(401).json({ error: "Not authenticated" });
-    }
-  });
-
-  app.post("/api/auth/logout", (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    delete sessions[sessionId];
-    res.clearCookie("sessionId");
-    res.json({ success: true });
-  });
-
-  // --- Prodigi & Stripe Integration ---
-
-  const PRODIGI_API_URL = "https://api.prodigi.com/v1.0";
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2025-02-11-preview",
-  });
-
-  app.post("/api/shipping/quote", async (req, res) => {
-    const { countryCode, sku } = req.body;
-    try {
-      const response = await axios.post(
-        `${PRODIGI_API_URL}/quotes`,
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
         {
-          destinationCountryCode: countryCode,
-          items: [{ sku, quantity: 1 }],
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: `${productName} — Mind Gallery`,
+              description: `"${thoughtId}" — Exclusive print`,
+              images: [imageUrl].filter(Boolean),
+            },
+            unit_amount: Math.round((price + (shippingPrice || 0)) * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      shipping_address_collection: {
+        allowed_countries: ["ES", "DE", "FR", "IT", "GB", "US", "NL", "BE", "PT", "AT", "CH"],
+      },
+      success_url: `${process.env.APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.APP_URL}/cancel`,
+      metadata: {
+        thoughtId,
+        sku,
+        countryCode,
+        imageUrl,
+      },
+    });
+
+    res.json({ url: session.url });
+  } catch (error: any) {
+    console.error("Stripe Checkout Error:", error.message);
+    res.status(500).json({ error: "Failed to create checkout session" });
+  }
+});
+
+// --- Stripe Webhook: Automatically create Prodigi order after payment ---
+app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig!, process.env.STRIPE_WEBHOOK_SECRET!);
+  } catch (err: any) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const { sku, countryCode, imageUrl } = session.metadata!;
+    const shipping = session.shipping_details;
+    const customer = session.customer_details;
+
+    try {
+      await axios.post(
+        `${PRODIGI_API_URL}/orders`,
+        {
+          shippingMethod: "Standard",
+          idempotencyKey: session.id,
+          recipient: {
+            address: {
+              line1: shipping?.address?.line1 || "",
+              line2: shipping?.address?.line2 || "",
+              postalCode: shipping?.address?.postal_code || "",
+              countryCode: countryCode || shipping?.address?.country || "ES",
+              townOrCity: shipping?.address?.city || "",
+              stateOrCounty: shipping?.address?.state || "",
+            },
+            name: shipping?.name || customer?.name || "Customer",
+            email: customer?.email || "",
+          },
+          items: [
+            {
+              sku,
+              copies: 1,
+              assets: [
+                {
+                  printArea: "default",
+                  url: imageUrl,
+                },
+              ],
+            },
+          ],
         },
         {
           headers: {
-            "X-API-Key": process.env.PRODIGI_API_KEY,
+            "X-API-Key": PRODIGI_API_KEY,
             "Content-Type": "application/json",
           },
         }
       );
-      res.json(response.data);
+      console.log("✅ Prodigi order created for session:", session.id);
     } catch (error: any) {
-      console.error("Prodigi Quote Error:", error.response?.data || error.message);
-      res.status(500).json({ error: "Failed to fetch shipping quote" });
+      console.error("❌ Prodigi Order Error:", error.response?.data || error.message);
     }
-  });
-
-  app.post("/api/checkout/create-session", async (req, res) => {
-    const { thoughtId, sku, price, shippingPrice, countryCode, imageUrl } = req.body;
-    
-    try {
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price_data: {
-              currency: "eur",
-              product_data: {
-                name: `Mind Gallery Print - ${thoughtId}`,
-                images: [imageUrl],
-              },
-              unit_amount: Math.round((price + shippingPrice) * 100),
-            },
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        success_url: `${process.env.APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.APP_URL}/cancel`,
-        metadata: {
-          thoughtId,
-          sku,
-          countryCode,
-          imageUrl,
-        },
-      });
-      res.json({ url: session.url });
-    } catch (error: any) {
-      console.error("Stripe Checkout Error:", error.message);
-      res.status(500).json({ error: "Failed to create checkout session" });
-    }
-  });
-
-  app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), async (req, res) => {
-    const sig = req.headers["stripe-signature"];
-    let event;
-
-    try {
-      event = stripe.webhooks.constructEvent(req.body, sig!, process.env.STRIPE_WEBHOOK_SECRET!);
-    } catch (err: any) {
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const { sku, countryCode, imageUrl } = session.metadata!;
-
-      // Create order in Prodigi
-      try {
-        await axios.post(
-          `${PRODIGI_API_URL}/orders`,
-          {
-            shippingMethod: "Standard",
-            recipient: {
-              address: {
-                line1: session.shipping_details?.address?.line1,
-                line2: session.shipping_details?.address?.line2,
-                postalCode: session.shipping_details?.address?.postal_code,
-                countryCode: countryCode,
-                townOrCity: session.shipping_details?.address?.city,
-                stateOrCounty: session.shipping_details?.address?.state,
-              },
-              name: session.shipping_details?.name,
-              email: session.customer_details?.email,
-            },
-            items: [
-              {
-                sku: sku,
-                copies: 1,
-                assets: [
-                  {
-                    printArea: "default",
-                    url: imageUrl,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            headers: {
-              "X-API-Key": process.env.PRODIGI_API_KEY,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      } catch (error: any) {
-        console.error("Prodigi Order Error:", error.response?.data || error.message);
-      }
-    }
-
-    res.json({ received: true });
-  });
-
-  app.get("/api/thoughts/user", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    
-    try {
-      const snapshot = await db.collection("thoughts").where("authorId", "==", user.id).get();
-      const thoughts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      res.json({ thoughts });
-    } catch (error) {
-      console.error("Firestore error:", error);
-      res.status(500).json({ error: "Failed to fetch thoughts" });
-    }
-  });
-
-  app.post("/api/thoughts", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    
-    const newThought = {
-      ...req.body,
-      authorId: user.id,
-      author: user.name,
-      isUserAdded: true,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    };
-    
-    try {
-      const docRef = await db.collection("thoughts").add(newThought);
-      res.json({ thought: { ...newThought, id: docRef.id } });
-    } catch (error) {
-      console.error("Firestore error:", error);
-      res.status(500).json({ error: "Failed to add thought" });
-    }
-  });
-
-  // --- Dashboard APIS (Blogs, Photos, Settings, Substack) ---
-
-  app.get("/api/blogs", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    
-    try {
-      const snapshot = await db.collection("blogs")
-        .where("authorId", "==", user.id)
-        .orderBy("createdAt", "desc")
-        .get();
-      const blogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      res.json({ blogs });
-    } catch (error) {
-      // If index is missing, firestore throws an error with a link to create it.
-      // For now, fallback to unordered if orderBy fails.
-      try {
-        const fallBackSnap = await db.collection("blogs").where("authorId", "==", user.id).get();
-        const blogs = fallBackSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        res.json({ blogs });
-      } catch (err) {
-        res.status(500).json({ error: "Failed to fetch blogs" });
-      }
-    }
-  });
-
-  app.post("/api/blogs", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-    if (!adminEmails.includes(user.email)) return res.status(403).json({ error: "Forbidden: Admin access only" });
-    
-    const newBlog = {
-      ...req.body,
-      authorId: user.id,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    };
-    
-    try {
-      const docRef = await db.collection("blogs").add(newBlog);
-      res.json({ blog: { ...newBlog, id: docRef.id } });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to add blog" });
-    }
-  });
-
-  app.delete("/api/blogs/:id", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-    if (!adminEmails.includes(user.email)) return res.status(403).json({ error: "Forbidden: Admin access only" });
-    
-    try {
-      await db.collection("blogs").doc(req.params.id).delete();
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to delete blog" });
-    }
-  });
-
-  app.get("/api/photos", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    
-    try {
-      const snapshot = await db.collection("photos").where("authorId", "==", user.id).get();
-      const photos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      res.json({ photos });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch photos" });
-    }
-  });
-
-  app.post("/api/photos", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-    if (!adminEmails.includes(user.email)) return res.status(403).json({ error: "Forbidden: Admin access only" });
-    
-    const newPhoto = {
-      ...req.body,
-      authorId: user.id,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    };
-    
-    try {
-      const docRef = await db.collection("photos").add(newPhoto);
-      res.json({ photo: { ...newPhoto, id: docRef.id } });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to add photo" });
-    }
-  });
-
-  app.delete("/api/photos/:id", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-    if (!adminEmails.includes(user.email)) return res.status(403).json({ error: "Forbidden: Admin access only" });
-    
-    try {
-      await db.collection("photos").doc(req.params.id).delete();
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to delete photo" });
-    }
-  });
-
-  app.get("/api/settings", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-    if (!adminEmails.includes(user.email)) return res.status(403).json({ error: "Forbidden: Admin access only" });
-    
-    try {
-      const doc = await db.collection("settings").doc(user.id).get();
-      res.json({ settings: doc.exists ? doc.data() : {} });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch settings" });
-    }
-  });
-
-  app.post("/api/settings", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-    if (!adminEmails.includes(user.email)) return res.status(403).json({ error: "Forbidden: Admin access only" });
-    
-    try {
-      await db.collection("settings").doc(user.id).set(req.body, { merge: true });
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to save settings" });
-    }
-  });
-
-  const parser = new Parser();
-  app.get("/api/substack", async (req, res) => {
-    const { url } = req.query;
-    if (!url || typeof url !== 'string') return res.status(400).json({ error: "URL is required" });
-    
-    try {
-      const rssUrl = url.endsWith('/feed') ? url : `${url.replace(/\/$/, '')}/feed`;
-      const feed = await parser.parseURL(rssUrl);
-      res.json({ feed });
-    } catch (error: any) {
-      console.error("Substack RSS Error:", error.message);
-      res.status(500).json({ error: "Failed to fetch Substack feed. Please ensure the URL is correct." });
-    }
-  });
-
-  // --- Global Site Configuration ---
-  app.get("/api/config/global", async (req, res) => {
-    try {
-      // Fetch the global config document
-      const doc = await db.collection("public_config").doc("global").get();
-      res.json({ config: doc.exists ? doc.data() : {} });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch global config" });
-    }
-  });
-
-  app.post("/api/config/global", async (req, res) => {
-    const sessionId = req.cookies.sessionId;
-    const user = sessions[sessionId];
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    
-    const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim());
-    if (!adminEmails.includes(user.email)) return res.status(403).json({ error: "Forbidden: Admin access only" });
-    
-    try {
-      await db.collection("public_config").doc("global").set(req.body, { merge: true });
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to save global config" });
-    }
-  });
-
-  // --- Groq Oracle Chat ---
-  app.post("/api/chat", async (req, res) => {
-    const { messages, language, thoughtContext } = req.body;
-    
-    try {
-      const response = await axios.post(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            {
-              role: "system",
-              content: `You are the Oracle of MindGallery, a wise and compassionate guide. 
-              Your purpose is to help users transform limiting beliefs into expansive thoughts. 
-              Respond in ${language === 'es' ? 'Spanish' : language === 'de' ? 'German' : 'English'}.
-              Keep responses concise, poetic, and encouraging. 
-              
-              AVAILABLE THOUGHTS IN GALLERY:
-              ${JSON.stringify(thoughtContext)}
-
-              If you find a thought in the list that matches the user's situation, include its ID at the very end of your response in the format: [RECOMMEND: id]. 
-              Only recommend if it's a very strong match.`
-            },
-            ...messages
-          ],
-          temperature: 0.7,
-          max_tokens: 500
-        },
-        {
-          headers: {
-            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      const fullText = response.data.choices[0].message.content;
-      res.json({ text: fullText });
-    } catch (error: any) {
-      console.error("Groq Chat Error:", error.response?.data || error.message);
-      res.status(500).json({ error: "The Oracle is momentarily disconnected." });
-    }
-  });
-
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
-    (async () => {
-      const { createServer: createViteServer } = await import("vite");
-      const vite = await createViteServer({
-        server: { middlewareMode: true },
-        appType: "spa",
-      });
-      app.use(vite.middlewares);
-      
-      app.listen(PORT, "0.0.0.0", () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-      });
-    })();
-  } else if (!process.env.VERCEL) {
-    app.use(express.static(path.join(__dirname, "dist")));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist", "index.html"));
-    });
-    
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
   }
+
+  res.json({ received: true });
+});
+
+// --- Groq Oracle Chat ---
+app.post("/api/chat", async (req, res) => {
+  const { messages, language, thoughtContext } = req.body;
+
+  try {
+    const response = await axios.post(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: `You are the Oracle of MindGallery, a wise and compassionate guide. 
+            Your purpose is to help users transform limiting beliefs into expansive thoughts. 
+            Respond in ${language === "es" ? "Spanish" : language === "de" ? "German" : "English"}.
+            Keep responses concise, poetic, and encouraging. 
+            
+            AVAILABLE THOUGHTS IN GALLERY:
+            ${JSON.stringify(thoughtContext)}
+
+            If you find a thought in the list that matches the user's situation, include its ID at the very end of your response in the format: [RECOMMEND: id]. 
+            Only recommend if it's a very strong match.`,
+          },
+          ...messages,
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const fullText = response.data.choices[0].message.content;
+    res.json({ text: fullText });
+  } catch (error: any) {
+    console.error("Groq Chat Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "The Oracle is momentarily disconnected." });
+  }
+});
+
+// --- Vite Dev / Static Serve ---
+if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+  (async () => {
+    const { createServer: createViteServer } = await import("vite");
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  })();
+} else if (!process.env.VERCEL) {
+  app.use(express.static(path.join(__dirname, "dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+  });
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+}
 
 export default app;

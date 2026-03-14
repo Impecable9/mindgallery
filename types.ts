@@ -64,3 +64,22 @@ export interface ThemeConfig {
   accent: string;
   icon: React.ReactNode;
 }
+
+export type ProductCategory = 'prints' | 'canvas' | 'framed' | 'apparel' | 'tech' | 'stationery' | 'stickers';
+
+export interface ProductVariant {
+  id: string;
+  sku: string;
+  name: string;
+  size: string;
+  price: number;
+  description?: string;
+}
+
+export interface ProductCatalog {
+  [key: string]: {
+    name: string;
+    description: string;
+    variants: ProductVariant[];
+  };
+}
