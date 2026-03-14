@@ -15,18 +15,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize Firebase Admin
+// Initialize Firebase Admin
 try {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (saRaw) {
     console.log("Found FIREBASE_SERVICE_ACCOUNT, attempting to parse...");
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      projectId: "mind-gallery-app-2026",
-      storageBucket: "mind-gallery-app-2026.appspot.com"
-    });
-    console.log("Firebase initialized with Service Account");
+    try {
+      const serviceAccount = JSON.parse(saRaw);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: "mind-gallery-app-2026",
+        storageBucket: "mind-gallery-app-2026.appspot.com"
+      });
+      console.log("Firebase initialized successfully with Service Account");
+    } catch (parseError: any) {
+      console.error("CRITICAL: Failed to parse FIREBASE_SERVICE_ACCOUNT. Check if it is valid JSON.", parseError.message);
+    }
   } else {
-    console.log("No FIREBASE_SERVICE_ACCOUNT found, using default credentials");
+    console.log("No FIREBASE_SERVICE_ACCOUNT found, attempting application default...");
     admin.initializeApp({
       credential: admin.credential.applicationDefault(),
       projectId: "mind-gallery-app-2026",
@@ -34,7 +40,7 @@ try {
     });
   }
 } catch (e: any) {
-  console.error("Firebase init failed detailed error:", e.message);
+  console.error("Firebase overall initialization failed:", e.message);
 }
 
 const db = admin.firestore();
