@@ -23,14 +23,14 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
@@ -313,18 +313,21 @@
   max-width: 1300px;
   height: 85vh;
   min-height: 600px;
-  background: #111111;
-  border-radius: 12px;
-  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+  background: rgba(9, 9, 9, 0.55);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border-radius: 32px;
+  box-shadow: 0 40px 100px -20px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(234,234,234,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .premium-modal-header {
   padding: 24px 32px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -376,8 +379,8 @@
 /* ── Section 1: Categories Nav ── */
 .premium-modal-nav {
   width: 250px;
-  border-right: 1px solid rgba(234,234,234,0.08);
-  background: #0d0d0d;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
   padding: 24px 0;
   overflow-y: auto;
   flex-shrink: 0;
@@ -403,13 +406,13 @@
   align-items: center;
   gap: 12px;
   padding: 14px 24px;
-  background: none;
+  background: transparent;
   border: none;
   text-align: left;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
@@ -497,8 +500,8 @@
 /* ── Section 3: Checkout Options ── */
 .premium-modal-checkout {
   width: 380px;
-  border-left: 1px solid rgba(234,234,234,0.08);
-  background: #111111;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.01);
   padding: 32px;
   display: flex;
   flex-direction: column;

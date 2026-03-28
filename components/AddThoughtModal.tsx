@@ -62,28 +62,33 @@ const AddThoughtModal: React.FC<AddThoughtModalProps> = ({ isOpen, onClose, lang
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50 backdrop-blur-2xl"
       />
       
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        className={`relative w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border ${
-          isNegativeMode ? 'bg-slate-900 border-white/10' : 'bg-white border-white/20'
+        className={`relative w-full max-w-lg rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden border backdrop-blur-3xl transition-all duration-500 ${
+          isNegativeMode 
+            ? 'bg-[#090909]/60 border-[rgba(255,255,255,0.08)]' 
+            : 'bg-white/70 border-white/60'
         }`}
       >
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-              <Plus className="text-white" size={18} />
+        <div className={`p-8 border-b flex items-center justify-between ${isNegativeMode ? 'border-[rgba(255,255,255,0.08)] bg-white/5' : 'border-black/5 bg-black/5'}`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg ${isNegativeMode ? 'bg-[#ff462e]' : 'bg-[#ff462e]'}`}>
+              <Plus className="text-white" size={20} />
             </div>
-            <h3 className={`text-xl font-serif font-bold ${isNegativeMode ? 'text-white' : 'text-slate-800'}`}>
-              {t.lblAddThoughtTitle}
-            </h3>
+            <div>
+              <h3 className={`text-xl font-serif font-bold ${isNegativeMode ? 'text-white' : 'text-slate-900'}`}>
+                {t.lblAddThoughtTitle}
+              </h3>
+              <p className={`text-[10px] uppercase tracking-[2px] font-bold opacity-50 ${isNegativeMode ? 'text-white' : 'text-slate-900'}`}>New Creation</p>
+            </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-            <X size={20} className={isNegativeMode ? 'text-gray-400' : 'text-slate-400'} />
+          <button onClick={onClose} className={`p-2 rounded-full transition-all group ${isNegativeMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}>
+            <X size={20} className={`transition-transform group-hover:rotate-90 ${isNegativeMode ? 'text-gray-400' : 'text-slate-500'}`} />
           </button>
         </div>
 
@@ -95,8 +100,8 @@ const AddThoughtModal: React.FC<AddThoughtModalProps> = ({ isOpen, onClose, lang
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as CategoryType)}
-              className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all ${
-                isNegativeMode ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              className={`w-full px-5 py-4 rounded-2xl border focus:ring-2 focus:ring-[#ff462e]/30 focus:outline-none transition-all backdrop-blur-md appearance-none ${
+                isNegativeMode ? 'bg-white/5 border-[rgba(255,255,255,0.08)] text-white' : 'bg-black/5 border-black/10 text-slate-800'
               }`}
             >
               {Object.values(CategoryType).map(cat => (
@@ -113,8 +118,8 @@ const AddThoughtModal: React.FC<AddThoughtModalProps> = ({ isOpen, onClose, lang
               value={limiting}
               onChange={(e) => setLimiting(e.target.value)}
               placeholder="e.g. I am not good enough..."
-              className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all min-h-[80px] ${
-                isNegativeMode ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              className={`w-full px-5 py-4 rounded-2xl border focus:ring-2 focus:ring-[#ff462e]/30 focus:outline-none transition-all min-h-[100px] shadow-inner backdrop-blur-md ${
+                isNegativeMode ? 'bg-white/5 border-[rgba(255,255,255,0.08)] text-white' : 'bg-black/5 border-black/10 text-slate-800'
               }`}
             />
           </div>
@@ -127,8 +132,8 @@ const AddThoughtModal: React.FC<AddThoughtModalProps> = ({ isOpen, onClose, lang
               value={expansive}
               onChange={(e) => setExpansive(e.target.value)}
               placeholder="e.g. I am worthy of all good things..."
-              className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all min-h-[80px] ${
-                isNegativeMode ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              className={`w-full px-5 py-4 rounded-2xl border focus:ring-2 focus:ring-[#ff462e]/30 focus:outline-none transition-all min-h-[100px] shadow-inner backdrop-blur-md ${
+                isNegativeMode ? 'bg-white/5 border-[rgba(255,255,255,0.08)] text-white' : 'bg-black/5 border-black/10 text-slate-800'
               }`}
             />
           </div>
@@ -136,13 +141,13 @@ const AddThoughtModal: React.FC<AddThoughtModalProps> = ({ isOpen, onClose, lang
           <button
             type="submit"
             disabled={isSubmitting || !limiting || !expansive}
-            className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
+            className={`w-full py-5 rounded-2xl font-bold uppercase tracking-[3px] text-xs flex items-center justify-center gap-2 transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] ${
               isSubmitting || !limiting || !expansive
-                ? 'bg-gray-500/20 text-gray-500 cursor-not-allowed'
-                : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                ? 'bg-gray-500/20 text-gray-400 cursor-not-allowed border border-white/5'
+                : 'bg-[#ff462e] hover:bg-[#c4321e] text-white shadow-[#ff462e]/20 hover:shadow-[#ff462e]/40'
             }`}
           >
-            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
+            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={18} />}
             {t.btnSave}
           </button>
         </form>

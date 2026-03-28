@@ -97,7 +97,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-2xl p-4"
       >
         <button 
           onClick={onClose} 
@@ -113,14 +113,14 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
             animate={{ y: 0, opacity: 1 }}
             className="mb-8"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-[0_0_30px_rgba(139,92,246,0.3)] mb-4">
-               <Dices className="text-white w-8 h-8" />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-gradient-to-br from-[#ff462e] to-[#4a1208] shadow-[0_10px_40px_rgba(255,70,46,0.3)] mb-6 border border-white/10 group-hover:scale-110 transition-transform duration-500">
+               <Dices className="text-white w-10 h-10" />
             </div>
-            <h2 className="text-3xl font-serif text-white font-bold mb-2">{t.rouletteTitle}</h2>
-            <p className="text-slate-400 text-sm max-w-xs mx-auto">{t.rouletteSub}</p>
+            <h2 className="text-4xl font-serif text-white font-bold mb-2 tracking-tight">{t.rouletteTitle}</h2>
+            <p className="text-slate-400 text-sm max-w-xs mx-auto font-medium opacity-80">{t.rouletteSub}</p>
           </motion.div>
 
-          <div className="relative w-full min-h-[300px] bg-slate-900 rounded-3xl border border-slate-700 shadow-2xl flex flex-col items-center justify-center p-6 mb-6 group">
+          <div className="relative w-full min-h-[350px] bg-[#090909]/40 backdrop-blur-3xl rounded-[3rem] border border-[rgba(255,255,255,0.08)] shadow-[0_40px_100px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center p-8 mb-8 group overflow-hidden">
              
              {/* Background Decoration */}
              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none rounded-3xl" />
@@ -141,8 +141,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
                         ))}
                       </motion.div>
                    </div>
-                   <Loader2 className="animate-spin text-violet-500" size={32} />
-                   <p className="text-xs uppercase tracking-widest text-violet-400 font-bold">{t.rouletteSpinning}</p>
+                   <Loader2 className="animate-spin text-[#ff462e]" size={32} />
+                   <p className="text-xs uppercase tracking-[3px] text-[#ff462e] font-bold opacity-80">{t.rouletteSpinning}</p>
                 </div>
              )}
 
@@ -167,14 +167,14 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
                    transition={{ type: "spring", stiffness: 200 }}
                    className="flex flex-col items-center gap-4 relative z-10 w-full"
                 >
-                   <div className={`p-3 rounded-full border-2 ${result.isNegative ? 'bg-indigo-950/50 border-indigo-500 text-indigo-400' : 'bg-amber-950/50 border-amber-500 text-amber-400'}`}>
+                   <div className={`p-4 rounded-3xl border shadow-2xl transition-all duration-500 ${result.isNegative ? 'bg-[#090909]/80 border-[#ff462e]/30 text-[#ff462e] shadow-[#ff462e]/10' : 'bg-white/10 border-[#ff462e]/50 text-[#ff462e] shadow-[#ff462e]/10'}`}>
                       {result.isNegative ? <Moon size={32} /> : <Sun size={32} />}
                    </div>
                    
-                   <div className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${
+                   <div className={`text-[10px] font-bold uppercase tracking-[3px] px-4 py-1.5 rounded-full border backdrop-blur-md transition-all ${
                       result.isNegative 
-                        ? 'bg-indigo-900/30 border-indigo-500/30 text-indigo-300' 
-                        : 'bg-amber-900/30 border-amber-500/30 text-amber-300'
+                        ? 'bg-black/40 border-white/10 text-white/60' 
+                        : 'bg-[#ff462e]/10 border-[#ff462e]/30 text-[#ff462e]'
                    }`}>
                       {result.isNegative ? t.rouletteResultShadow : t.rouletteResultLight}
                    </div>
@@ -198,7 +198,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
                          </button>
                       ) : (
                          <div className="text-left">
-                            <h4 className="text-[10px] font-bold uppercase tracking-wider text-violet-400 mb-1 flex items-center gap-1">
+                            <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#ff462e] mb-1 flex items-center gap-1">
                                <Sparkles size={10} /> Wisdom Guide
                             </h4>
                             <p className="text-xs text-slate-300 leading-relaxed">
@@ -212,11 +212,10 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
              )}
 
              {/* Dynamic Border Glow */}
-             <div className={`absolute inset-0 border-4 rounded-3xl pointer-events-none transition-colors duration-500 ${
-                isSpinning ? 'border-violet-500/20' : 
-                result?.isNegative ? 'border-indigo-500/50 shadow-[inset_0_0_50px_rgba(99,102,241,0.2)]' : 
-                result ? 'border-amber-500/50 shadow-[inset_0_0_50px_rgba(245,158,11,0.2)]' : 
-                'border-slate-800'
+             <div className={`absolute inset-0 border-4 rounded-[3rem] pointer-events-none transition-all duration-700 ${
+                isSpinning ? 'border-[#ff462e]/30 shadow-[0_0_80px_rgba(255,70,46,0.1)]' : 
+                result ? 'border-[#ff462e]/40 shadow-[inset_0_0_80px_rgba(255,70,46,0.15)]' : 
+                'border-white/5'
              }`} />
           </div>
 
@@ -225,10 +224,10 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
                 <button
                   onClick={handleSpin}
                   disabled={isSpinning}
-                  className={`w-full py-4 rounded-xl font-bold text-lg tracking-wide shadow-lg transition-all flex items-center justify-center gap-2
+                  className={`w-full py-5 rounded-2xl font-bold text-xs uppercase tracking-[3px] shadow-2xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]
                     ${isSpinning 
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
-                      : 'bg-white text-slate-900 hover:bg-slate-200 hover:scale-[1.02]'}
+                      ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5' 
+                      : 'bg-[#ff462e] text-white hover:bg-[#c4321e]'}
                   `}
                 >
                   {isSpinning ? t.rouletteSpinning : t.rouletteSpin}
@@ -239,15 +238,13 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, onSelectTh
                 <div className="flex gap-3">
                    <button
                      onClick={handleSpin}
-                     className="flex-1 py-4 rounded-xl font-bold text-sm tracking-wide bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors border border-slate-700"
+                     className="flex-1 py-5 rounded-2xl font-bold text-xs uppercase tracking-[2px] backdrop-blur-md bg-white/5 text-white/60 hover:bg-white/10 transition-all border border-white/10"
                    >
                      {t.rouletteSpin}
                    </button>
                    <button
                      onClick={handleAccept}
-                     className={`flex-[2] py-4 rounded-xl font-bold text-sm tracking-wide shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2
-                       ${result.isNegative ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-amber-500 hover:bg-amber-400 text-black'}
-                     `}
+                     className={`flex-[2] py-5 rounded-2xl font-bold text-xs uppercase tracking-[2px] shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 ${result.isNegative ? 'bg-[#ff462e] text-white hover:bg-[#c4321e]' : 'bg-[#ff462e] text-white hover:bg-[#c4321e]'}`}
                    >
                      {t.rouletteOpen} <ArrowRight size={18} />
                    </button>
