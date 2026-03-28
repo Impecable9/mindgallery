@@ -16,6 +16,12 @@ const PORT = 3000;
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// Global error handler to prevent plain text responses
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error("🔥 GLOBAL_ERROR:", err.stack || err);
+  res.status(500).json({ error: "A server error occurred within the Oracle structure." });
+});
+
 // --- Prodigi API ---
 const PRODIGI_API_URL = "https://api.prodigi.com/v4.0";
 const PRODIGI_API_KEY = process.env.PRODIGI_API_KEY!;
@@ -37,7 +43,6 @@ app.get("/api/debug", (req, res) => {
 });
 
 // --- Prodigi: Get product catalog by category ---
-// GET /api/products?category=hoodies&page=1
 app.get("/api/products", async (req, res) => {
   const { category, page = "1", limit = "20" } = req.query;
   try {
@@ -63,7 +68,6 @@ app.get("/api/products", async (req, res) => {
 });
 
 // --- Prodigi: Get single product details by SKU ---
-// GET /api/products/:sku
 app.get("/api/products/:sku", async (req, res) => {
   const { sku } = req.params;
   try {
@@ -81,17 +85,6 @@ app.get("/api/products/:sku", async (req, res) => {
 });
 
 // --- Image Upload: base64 → public URL via Cloudinary (unsigned) ---
-// POST /api/upload-image
-// Body: { imageBase64: string }  (full data URI or raw base64)
-//
-// Setup (free, no credit card — https://cloudinary.com):
-//   1. Register at cloudinary.com → free tier (25 GB storage/bandwidth)
-//   2. Copy your Cloud Name from the Dashboard
-//   3. Settings → Upload → Upload Presets → Add upload preset → Unsigned
-//   4. Add to .env:
-//        CLOUDINARY_CLOUD_NAME=your_cloud_name
-//        CLOUDINARY_UPLOAD_PRESET=your_preset_name
-//
 app.post("/api/upload-image", async (req, res) => {
   const { imageBase64 } = req.body;
   if (!imageBase64) {
@@ -109,9 +102,9 @@ app.post("/api/upload-image", async (req, res) => {
 
   try {
     const params = new URLSearchParams({
-      file:           imageBase64,          // Cloudinary accepts full data URIs
+      file:           imageBase64,
       upload_preset:  UPLOAD_PRESET,
-      folder:         "mindgallery",        // organises uploads in your Cloudinary dashboard
+      folder:         "mindgallery",
     });
 
     const response = await axios.post(
@@ -120,7 +113,6 @@ app.post("/api/upload-image", async (req, res) => {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    // Return the secure HTTPS URL Cloudinary assigned
     res.json({ url: response.data.secure_url });
   } catch (error: any) {
     const detail = error.response?.data?.error?.message || error.response?.data || error.message;
@@ -129,9 +121,7 @@ app.post("/api/upload-image", async (req, res) => {
   }
 });
 
-// --- Prodigi: Generate Mockup for a product + artwork image ---
-// POST /api/mockup
-// Body: { sku: string, imageUrl: string, text?: string }
+// --- Prodigi: Generate Mockup ---
 app.post("/api/mockup", async (req, res) => {
   const { sku, imageUrl } = req.body;
 
@@ -140,7 +130,6 @@ app.post("/api/mockup", async (req, res) => {
   }
 
   try {
-    // Prodigi Mockup API endpoint (v4)
     const response = await axios.post(
       `${PRODIGI_API_URL}/mockups`,
       {
@@ -168,7 +157,6 @@ app.post("/api/mockup", async (req, res) => {
 });
 
 // --- Prodigi: Shipping quote ---
-// POST /api/shipping/quote
 app.post("/api/shipping/quote", async (req, res) => {
   const { countryCode, sku } = req.body;
   try {
@@ -193,7 +181,6 @@ app.post("/api/shipping/quote", async (req, res) => {
 });
 
 // --- Stripe: Create checkout session ---
-// POST /api/checkout/create-session
 app.post("/api/checkout/create-session", async (req, res) => {
   const { thoughtId, sku, productName, price, shippingPrice, countryCode, imageUrl } = req.body;
 
@@ -235,7 +222,7 @@ app.post("/api/checkout/create-session", async (req, res) => {
   }
 });
 
-// --- Stripe Webhook: Automatically create Prodigi order after payment ---
+// --- Stripe Webhook ---
 app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), async (req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
@@ -301,15 +288,15 @@ app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), asyn
 
 // --- Groq Oracle Chat ---
 app.post("/api/chat", async (req, res) => {
-  const { messages, language, thoughtContext } = req.body;
-  const apiKey = process.env.GROQ_API_KEY;
-
-  if (!apiKey) {
-    console.error("❌ Groq API Key is missing from environment variables.");
-    return res.status(500).json({ error: "The Oracle is missing its divine key (API Key not set)." });
-  }
-
   try {
+    const { messages, language, thoughtContext } = req.body;
+    const apiKey = (process.env.GROQ_API_KEY || "").trim();
+
+    if (!apiKey) {
+      console.error("❌ Groq API Key is missing.");
+      return res.status(500).json({ error: "The Oracle is missing its divine key (API Key not set)." });
+    }
+
     const response = await axios.post(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -347,7 +334,6 @@ app.post("/api/chat", async (req, res) => {
     const errorDetail = error.response?.data || error.message;
     console.error("Groq Chat Error:", errorDetail);
     
-    // Check if it's an authentication error
     if (error.response?.status === 401) {
       return res.status(500).json({ error: "The Oracle is unauthorized. Please check the API key." });
     }
