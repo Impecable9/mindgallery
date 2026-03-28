@@ -41,24 +41,24 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
   };
 
   return (
-    <section className="py-20 px-6 relative overflow-hidden">
+    <div className="py-10 md:py-20 px-6 relative overflow-hidden bg-[#0a0a0a] rounded-[3rem] border border-white/10 shadow-2xl overflow-y-auto">
       {/* Background Orbs */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ff462e]/5 rounded-full blur-[120px] -z-10" />
       
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-12 items-center">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
           
           {/* Editor Card */}
-          <div className="flex-1 w-full">
+          <div className="flex-1 w-full order-2 lg:order-1">
             <motion.div 
                initial={{ opacity: 0, x: -30 }}
                whileInView={{ opacity: 1, x: 0 }}
                viewport={{ once: true }}
-               className={`p-10 rounded-[3rem] border backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] ${
+               className={`p-6 md:p-10 rounded-[3rem] border backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] ${
                  isNegativeMode ? 'bg-[#090909]/60 border-white/10' : 'bg-white/70 border-white/80'
                }`}
             >
-              <h2 className="text-3xl font-serif font-bold mb-8 flex items-center gap-4">
+              <h2 className="text-2xl md:text-3xl font-serif font-bold mb-8 flex items-center gap-4">
                 <Sparkles className="text-[#ff462e]" />
                 {language === 'es' ? 'Ancla tu Abundancia' : 'Anchor Your Abundance'}
               </h2>
@@ -71,7 +71,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    className={`w-full p-8 rounded-[2rem] border min-h-[220px] text-xl font-serif leading-relaxed focus:ring-2 focus:ring-[#ff462e]/30 outline-none transition-all resize-none shadow-inner ${
+                    className={`w-full p-6 md:p-8 rounded-[2rem] border min-h-[180px] md:min-h-[220px] text-lg md:text-xl font-serif leading-relaxed focus:ring-2 focus:ring-[#ff462e]/30 outline-none transition-all resize-none shadow-inner ${
                       isNegativeMode ? 'bg-black/40 border-white/5 text-white' : 'bg-white/80 border-slate-200 text-slate-800'
                     }`}
                     placeholder="..."
@@ -82,7 +82,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                   onClick={handleCreate}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
-                  className="w-full py-6 rounded-2xl bg-[#ff462e] text-white flex items-center justify-center gap-4 text-sm font-bold uppercase tracking-[4px] shadow-[0_20px_40px_rgba(255,70,46,0.3)] hover:shadow-[0_25px_50px_rgba(255,70,46,0.4)] transition-all relative overflow-hidden group"
+                  className="w-full py-5 md:py-6 rounded-2xl bg-[#ff462e] text-white flex items-center justify-center gap-4 text-xs md:text-sm font-bold uppercase tracking-[4px] shadow-[0_20px_40px_rgba(255,70,46,0.3)] hover:shadow-[0_25px_50px_rgba(255,70,46,0.4)] transition-all relative overflow-hidden group"
                 >
                   <motion.div
                     animate={{ x: isHovered ? 5 : 0 }}
@@ -98,7 +98,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
           </div>
 
           {/* Advice Side */}
-          <div className="flex-1 w-full space-y-8">
+          <div className="flex-1 w-full space-y-8 order-1 lg:order-2">
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -108,11 +108,11 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                 <Info size={14} />
                 Guía de Manifestación
               </div>
-              <h3 className="text-4xl font-serif font-bold text-white mb-8 leading-tight">
+              <h3 className="text-2xl md:text-4xl font-serif font-bold text-white mb-6 leading-tight">
                 {language === 'es' ? 'Cómo diseñar un pensamiento de poder' : 'How to design a power thought'}
               </h3>
               
-              <div className="grid gap-6">
+              <div className="grid gap-4 md:gap-6">
                 {tips.map((tip, idx) => (
                   <motion.div
                     key={idx}
@@ -120,7 +120,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className={`p-6 rounded-3xl border flex items-start gap-4 backdrop-blur-xl transition-all hover:translate-x-2 ${
+                    className={`p-4 md:p-6 rounded-3xl border flex items-start gap-4 backdrop-blur-xl transition-all hover:translate-x-2 ${
                       isNegativeMode ? 'bg-[#111111]/40 border-white/5' : 'bg-white/40 border-slate-100'
                     }`}
                   >
@@ -128,15 +128,15 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                       {tip.icon}
                     </div>
                     <div>
-                      <h4 className="text-white font-bold mb-1">{tip.title}</h4>
-                      <p className="text-slate-400 text-sm leading-relaxed">{tip.desc}</p>
+                      <h4 className="text-white font-bold mb-1 text-sm md:text-base">{tip.title}</h4>
+                      <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{tip.desc}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              <div className={`mt-10 p-6 rounded-[2rem] border-l-4 border-[#ff462e] ${isNegativeMode ? 'bg-black/40 border-white/10' : 'bg-white/40 border-slate-100'}`}>
-                <p className="text-slate-300 italic text-sm">
+              <div className={`mt-6 md:mt-10 p-4 md:p-6 rounded-[2rem] border-l-4 border-[#ff462e] ${isNegativeMode ? 'bg-black/40 border-white/10' : 'bg-white/40 border-slate-100'}`}>
+                <p className="text-slate-300 italic text-xs md:text-sm leading-relaxed">
                   {language === 'es' 
                     ? '"La palabra tiene poder creativo. El pensamiento de abundancia es la instrucción que le das a tu campo de energía."'
                     : '"Words hold creative power. An abundance thought is the instruction you give to your energy field."'}
@@ -147,7 +147,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
 
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

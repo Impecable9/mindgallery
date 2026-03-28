@@ -42,9 +42,7 @@ const App: React.FC = () => {
     color: 'black'
   });
 
-  // Global Config from Backend (Hero overrides)
-  const [globalConfig, setGlobalConfig] = useState<any>({});
-
+  const [isAbundanceOpen, setIsAbundanceOpen] = useState(false);
   const t = UI_TRANSLATIONS[language];
 
   // Likes State (In-memory for demo)
@@ -162,6 +160,15 @@ const App: React.FC = () => {
               {item.icon}{item.label}
             </button>
           ))}
+          {/* Manifest Button */}
+          <button
+            onClick={() => setIsAbundanceOpen(true)}
+            className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all text-[#ff462e] animate-pulse"
+            style={{ fontFamily: "'Comfortaa', sans-serif" }}
+          >
+            <Sparkles size={14} />
+            Manifest
+          </button>
         </div>
 
         {/* Right actions */}
@@ -337,40 +344,18 @@ const App: React.FC = () => {
         
         {viewMode === 'GALLERY' ? (
           <>
-            {/* New Hero Section showing mockups */}
             <HeroSection
               isNegativeMode={isNegativeMode}
               language={language}
-              globalConfig={globalConfig}
               onShopClick={() => {
                 const pool = THOUGHTS_DATA.filter(t => !t.isPremium);
                 const pick = pool[Math.floor(Math.random() * pool.length)] || THOUGHTS_DATA[0];
                 setSelectedThought(pick);
               }}
+              onManifestClick={() => setIsAbundanceOpen(true)}
             />
 
-            <AbundanceCreator 
-              isNegativeMode={isNegativeMode} 
-              language={language}
-              onSave={(thoughtContent) => {
-                // For now, it opens the editor with this custom content
-                // We fake a thought object
-                const customThought: Thought = {
-                  id: 'custom-' + Date.now(),
-                  category: CategoryType.ABUNDANCE,
-                  content: {
-                    en: { limiting: '...', expansive: thoughtContent.expansive },
-                    es: { limiting: '...', expansive: thoughtContent.expansive },
-                    de: { limiting: '...', expansive: thoughtContent.expansive }
-                  },
-                  author: language === 'es' ? 'Tú (Arquitecto de Realidad)' : 'You (Reality Architect)',
-                  likes: 0,
-                  isPremium: false,
-                  visualDescription: "Custom manifestation art"
-                };
-                setSelectedThought(customThought);
-              }}
-            />
+
 
             {/* Context Header */}
             <div className="text-center mb-8">
@@ -661,6 +646,51 @@ const App: React.FC = () => {
           onClose={() => setIsPurchaseModalOpen(false)}
           language={language}
         />
+      )}
+
+      {isAbundanceOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsAbundanceOpen(false)}
+            className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+          />
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto"
+          >
+            <AbundanceCreator 
+                isNegativeMode={isNegativeMode} 
+                language={language}
+                onSave={(thoughtContent) => {
+                    const customThought: Thought = {
+                        id: 'custom-' + Date.now(),
+                        category: CategoryType.ABUNDANCE,
+                        content: {
+                            en: { limiting: '...', expansive: thoughtContent.expansive },
+                            es: { limiting: '...', expansive: thoughtContent.expansive },
+                            de: { limiting: '...', expansive: thoughtContent.expansive }
+                        },
+                        author: language === 'es' ? 'Tú (Arquitecto de Realidad)' : 'You (Reality Architect)',
+                        likes: 0,
+                        isPremium: false,
+                        visualDescription: "Custom manifestation art"
+                    };
+                    setSelectedThought(customThought);
+                    setIsAbundanceOpen(false);
+                }}
+            />
+            <button 
+              onClick={() => setIsAbundanceOpen(false)}
+              className="absolute top-8 right-8 text-white/40 hover:text-white transition-colors"
+            >
+              <Grid size={32} className="rotate-45" />
+            </button>
+          </motion.div>
+        </div>
       )}
 
     </div>
