@@ -137,8 +137,13 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
            {onSearch && (
              <button
                onClick={(e) => { e.stopPropagation(); onSearch(thought.category); }}
-               className="p-1.5 rounded-full transition-all"
-               style={{ background: 'rgba(9,9,9,0.5)', border: '1px solid rgba(234,234,234,0.15)', color: '#7f7f80', backdropFilter: 'blur(8px)' }}
+               className="p-1.5 rounded-full transition-all hover:scale-110 shadow-sm"
+               style={{ 
+                 background: isNegativeMode ? 'rgba(9,9,9,0.7)' : 'rgba(255,255,255,0.8)', 
+                 border: isNegativeMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)', 
+                 color: isNegativeMode ? '#f9f9f9' : '#090909', 
+                 backdropFilter: 'blur(8px)' 
+               }}
                title="Find similar thoughts"
              >
                <Search size={14} />
@@ -147,7 +152,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
             {onPurchase && (
               <button
                 onClick={(e) => { e.stopPropagation(); onPurchase(thought); }}
-                className="p-1.5 rounded-full transition-all"
+                className="p-1.5 rounded-full transition-all hover:scale-110 shadow-sm"
                 style={{ background: 'rgba(255,70,46,0.15)', border: '1px solid rgba(255,70,46,0.35)', color: '#ff462e', backdropFilter: 'blur(8px)' }}
                 title="Buy physical print"
               >
@@ -156,11 +161,11 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
             )}
            <button
              onClick={(e) => { e.stopPropagation(); onLike(thought.id); }}
-             className="flex items-center gap-1 px-2 py-1 rounded-full transition-all"
+             className="flex items-center gap-1 px-2 py-1 rounded-full transition-all hover:scale-105 shadow-sm"
              style={{
-               background: liked ? 'rgba(255,70,46,0.15)' : 'rgba(9,9,9,0.5)',
-               border: liked ? '1px solid rgba(255,70,46,0.35)' : '1px solid rgba(234,234,234,0.15)',
-               color: liked ? '#ff462e' : '#7f7f80',
+               background: liked ? 'rgba(255,70,46,0.15)' : (isNegativeMode ? 'rgba(9,9,9,0.7)' : 'rgba(255,255,255,0.8)'),
+               border: liked ? '1px solid rgba(255,70,46,0.35)' : (isNegativeMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)'),
+               color: liked ? '#ff462e' : (isNegativeMode ? '#f9f9f9' : '#090909'),
                backdropFilter: 'blur(8px)',
              }}
            >
