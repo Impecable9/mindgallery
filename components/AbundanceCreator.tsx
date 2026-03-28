@@ -109,21 +109,23 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
           </div>
 
           {/* Advice Side */}
-          <div className="flex-1 w-full space-y-8 order-1 lg:order-2">
+          <div className="flex-1 w-full order-1 lg:order-2 self-start">
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ff462e]/10 border border-[#ff462e]/20 text-[#ff462e] text-[10px] font-bold uppercase tracking-widest mb-6">
-                <Info size={14} />
-                {language === 'es' ? 'Guía de Manifestación' : language === 'de' ? 'Manifestations-Leitfaden' : 'Manifestation Guide'}
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ff462e]/10 border border-[#ff462e]/20 text-[#ff462e] text-[10px] font-bold uppercase tracking-widest shrink-0">
+                  <Info size={14} />
+                  {language === 'es' ? 'Guía de Manifestación' : language === 'de' ? 'Manifestations-Leitfaden' : 'Manifestation Guide'}
+                </div>
+                <h3 className="text-xl md:text-2xl font-serif font-bold text-white leading-tight">
+                  {language === 'es' ? 'Cómo diseñar un pensamiento de poder' : language === 'de' ? 'Wie man einen Gedanken der Kraft gestaltet' : 'How to design a power thought'}
+                </h3>
               </div>
-              <h3 className="text-2xl md:text-4xl font-serif font-bold text-white mb-6 leading-tight">
-                {language === 'es' ? 'Cómo diseñar un pensamiento de poder' : language === 'de' ? 'Wie man einen Gedanken der Kraft gestaltet' : 'How to design a power thought'}
-              </h3>
               
-              <div className="grid gap-4 md:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-3 md:gap-4">
                 {tips.map((tip, idx) => (
                   <motion.div
                     key={idx}
@@ -131,31 +133,29 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className={`group p-4 md:p-8 rounded-[3rem] transition-all duration-700 hover:translate-x-3 glass-premium glass-noise shadow-[0_30px_60px_rgba(0,0,0,0.5)] border-white/20`}
+                    className={`group flex items-center gap-4 p-4 md:p-5 rounded-[2rem] transition-all duration-700 hover:translate-x-2 glass-premium glass-noise shadow-[0_15px_30px_rgba(0,0,0,0.3)] border-white/10`}
                   >
-                    <div className="p-4 bg-gradient-to-br from-[#ff462e]/20 to-[#ff462e]/5 rounded-2xl border border-[#ff462e]/20 shrink-0 group-hover:scale-110 transition-transform">
+                    <div className="p-3 bg-gradient-to-br from-[#ff462e]/20 to-[#ff462e]/5 rounded-xl border border-[#ff462e]/20 shrink-0 group-hover:scale-110 transition-transform">
                       {tip.icon}
                     </div>
                     <div>
-                      <h4 className="text-white font-serif font-bold mb-1 text-base md:text-lg tracking-tight group-hover:text-[#ff462e] transition-colors">{tip.title}</h4>
-                      <p className="text-slate-400 text-xs md:text-sm leading-relaxed opacity-80">{tip.desc}</p>
+                      <h4 className="text-white font-serif font-bold mb-0.5 text-sm md:text-base tracking-tight group-hover:text-[#ff462e] transition-colors">{tip.title}</h4>
+                      <p className="text-slate-400 text-[10px] md:text-xs leading-relaxed opacity-80 line-clamp-2 md:line-clamp-none">{tip.desc}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              <div className={`mt-8 md:mt-12 p-10 rounded-[4rem] relative overflow-hidden group transition-all duration-1000 glass-premium glass-noise border-white/10`}>
-                {/* Refraction Effect Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                
-                <p className="text-slate-200 italic text-sm md:text-base leading-relaxed relative z-10 font-serif">
+              <div className={`mt-6 p-6 rounded-[2.5rem] relative overflow-hidden group transition-all duration-1000 glass-premium glass-noise border-white/5`}>
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1500ms]" />
+                <p className="text-slate-300 italic text-[11px] md:text-xs leading-relaxed relative z-10 font-serif opacity-70">
                   {language === 'es' 
                     ? '"La palabra tiene poder creativo. El pensamiento de abundancia es la instrucción que le das a tu campo de energía."'
                     : language === 'de'
                     ? '"Worte haben schöpferische Kraft. Ein Gedanke des Überflusses ist die Anweisung, die du deinem Energiefeld gibst."'
                     : '"Words hold creative power. An abundance thought is the instruction you give to your energy field."'}
                 </p>
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ff462e]" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ff462e]/50" />
               </div>
             </motion.div>
           </div>
