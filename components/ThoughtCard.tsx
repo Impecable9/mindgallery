@@ -139,9 +139,9 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
                onClick={(e) => { e.stopPropagation(); onSearch(thought.category); }}
                className="p-1.5 rounded-full transition-all hover:scale-110 shadow-sm"
                style={{ 
-                 background: isNegativeMode ? 'rgba(9,9,9,0.7)' : 'rgba(255,255,255,0.8)', 
-                 border: isNegativeMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)', 
-                 color: isNegativeMode ? '#f9f9f9' : '#090909', 
+                 background: isNegativeMode ? 'rgba(9,9,9,0.7)' : 'rgba(255,255,255,0.85)', 
+                 border: isNegativeMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,70,46,0.2)', 
+                 color: '#ff462e', 
                  backdropFilter: 'blur(8px)' 
                }}
                title="Find similar thoughts"
@@ -163,9 +163,9 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
              onClick={(e) => { e.stopPropagation(); onLike(thought.id); }}
              className="flex items-center gap-1 px-2 py-1 rounded-full transition-all hover:scale-105 shadow-sm"
              style={{
-               background: liked ? 'rgba(255,70,46,0.15)' : (isNegativeMode ? 'rgba(9,9,9,0.7)' : 'rgba(255,255,255,0.8)'),
-               border: liked ? '1px solid rgba(255,70,46,0.35)' : (isNegativeMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)'),
-               color: liked ? '#ff462e' : (isNegativeMode ? '#f9f9f9' : '#090909'),
+               background: liked ? 'rgba(255,70,46,0.15)' : (isNegativeMode ? 'rgba(9,9,9,0.7)' : 'rgba(255,255,255,0.85)'),
+               border: liked ? '1px solid rgba(255,70,46,0.35)' : (isNegativeMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,70,46,0.2)'),
+               color: '#ff462e',
                backdropFilter: 'blur(8px)',
              }}
            >

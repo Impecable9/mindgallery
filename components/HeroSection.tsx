@@ -17,11 +17,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, glo
 
   const slides = t.heroSlides || [];
   const icons = [
-    <MessageSquare size={20} className="text-rose-500" />,
-    <Search size={20} className="text-blue-500" />,
-    <Dices size={20} className="text-purple-500" />,
-    <ShoppingBag size={20} className="text-emerald-500" />,
-    <BookOpen size={20} className="text-amber-500" />
+    <MessageSquare size={20} className="text-[#ff462e]" />,
+    <Search size={20} className="text-[#ff462e]" />,
+    <Dices size={20} className="text-[#ff462e]" />,
+    <ShoppingBag size={20} className="text-[#ff462e]" />,
+    <BookOpen size={20} className="text-[#ff462e]" />
   ];
 
   const PRODUCT_PILLS = [
@@ -113,7 +113,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, glo
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.5 }}
-              className={`p-6 backdrop-blur-xl rounded-2xl border shadow-lg ${isNegativeMode ? 'bg-black/60 border-white/10 text-white' : 'bg-white/70 border-white/40 text-slate-900'}`}
+              className={`p-8 backdrop-blur-3xl rounded-[2rem] border shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-all duration-500 ${isNegativeMode ? 'bg-[#090909]/60 border-[rgba(255,255,255,0.08)] text-white' : 'bg-white/70 border-white/60 text-slate-900'}`}
           >
               <div className="flex items-center gap-3 mb-2">
                 {icons[currentSlide]}
@@ -128,7 +128,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, glo
                 {slides.map((_, i) => (
                   <div 
                     key={i} 
-                    className={`h-1 rounded-full transition-all duration-500 ${i === currentSlide ? 'w-8 bg-rose-500' : 'w-2 bg-white/20'}`} 
+                    className={`h-1.5 rounded-full transition-all duration-700 ${i === currentSlide ? 'w-12 bg-[#ff462e]' : 'w-3 bg-white/20'}`} 
                   />
                 ))}
               </div>
@@ -137,16 +137,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, glo
       </div>
       {/* Shop CTA — bottom right */}
       <div className="absolute bottom-8 right-6 md:right-12 z-10 max-w-xs">
-        <div className={`p-4 rounded-2xl border backdrop-blur-xl shadow-lg ${
-          isNegativeMode ? 'bg-black/60 border-white/10' : 'bg-white/70 border-white/40'
+        <div className={`p-6 rounded-[2rem] border backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-all duration-500 ${
+          isNegativeMode ? 'bg-[#090909]/60 border-[rgba(255,255,255,0.08)]' : 'bg-white/70 border-white/60'
         }`}>
           <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${
             isNegativeMode ? 'text-slate-400' : 'text-slate-500'
           }`}>🛒 Wear Your Thoughts</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {PRODUCT_PILLS.map(p => (
-              <span key={p.label} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium border ${
-                isNegativeMode ? 'bg-white/10 border-white/20 text-white' : 'bg-slate-100 border-slate-200 text-slate-700'
+              <span key={p.label} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider border transition-all ${
+                isNegativeMode ? 'bg-white/5 border-white/10 text-white/70' : 'bg-black/5 border-black/10 text-slate-700'
               }`}>
                 {p.icon}{p.label}
               </span>
@@ -154,9 +154,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ isNegativeMode, language, glo
           </div>
           <button
             onClick={onShopClick}
-            className="w-full py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg"
+            className="w-full py-4 rounded-2xl text-xs uppercase tracking-[3px] font-bold text-white bg-[#ff462e] hover:bg-[#c4321e] transition-all flex items-center justify-center gap-3 shadow-2xl hover:scale-[1.02] active:scale-[0.95]"
           >
-            <ShoppingBag size={16} />
+            <ShoppingBag size={18} />
             Explore Products
           </button>
         </div>
