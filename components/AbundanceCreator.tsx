@@ -54,25 +54,30 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                initial={{ opacity: 0, x: -30 }}
                whileInView={{ opacity: 1, x: 0 }}
                viewport={{ once: true }}
-               className={`p-6 md:p-10 rounded-[3rem] border backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] ${
-                 isNegativeMode ? 'bg-[#090909]/60 border-white/10' : 'bg-white/70 border-white/80'
+               className={`p-8 md:p-12 rounded-[3.5rem] border backdrop-blur-[50px] shadow-[0_60px_120px_rgba(0,0,0,0.5)] relative overflow-hidden group/editor ${
+                 isNegativeMode ? 'bg-white/[0.03] border-white/[0.08]' : 'bg-white/70 border-white/80'
                }`}
             >
-              <h2 className="text-2xl md:text-3xl font-serif font-bold mb-8 flex items-center gap-4">
-                <Sparkles className="text-[#ff462e]" />
+              {/* Refraction effect for the editor card */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover/editor:translate-x-full transition-transform duration-[1500ms]" />
+
+              <h2 className="text-3xl md:text-4xl font-serif font-bold mb-10 flex items-center gap-5 relative z-10">
+                <div className="p-3 bg-[#ff462e]/10 rounded-2xl border border-[#ff462e]/20">
+                  <Sparkles className="text-[#ff462e]" size={28} />
+                </div>
                 {language === 'es' ? 'Ancla tu Abundancia' : 'Anchor Your Abundance'}
               </h2>
 
-              <div className="space-y-6">
+              <div className="space-y-8 relative z-10">
                 <div>
-                  <label className={`block text-[10px] uppercase tracking-[4px] font-bold mb-4 ${isNegativeMode ? 'text-white/40' : 'text-slate-400'}`}>
+                  <label className={`block text-[11px] uppercase tracking-[6px] font-bold mb-5 ${isNegativeMode ? 'text-white/30' : 'text-slate-400'}`}>
                     {language === 'es' ? 'Escribe tu nueva realidad' : 'Write your new reality'}
                   </label>
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    className={`w-full p-6 md:p-8 rounded-[2rem] border min-h-[180px] md:min-h-[220px] text-lg md:text-xl font-serif leading-relaxed focus:ring-2 focus:ring-[#ff462e]/30 outline-none transition-all resize-none shadow-inner ${
-                      isNegativeMode ? 'bg-black/40 border-white/5 text-white' : 'bg-white/80 border-slate-200 text-slate-800'
+                    className={`w-full p-8 md:p-10 rounded-[2.5rem] border min-h-[220px] md:min-h-[280px] text-xl md:text-2xl font-serif leading-relaxed focus:ring-2 focus:ring-[#ff462e]/40 outline-none transition-all resize-none shadow-2xl ${
+                      isNegativeMode ? 'bg-black/60 border-white/[0.05] text-white placeholder:text-white/10' : 'bg-white/90 border-slate-200 text-slate-800'
                     }`}
                     placeholder="..."
                   />
@@ -82,16 +87,16 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                   onClick={handleCreate}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
-                  className="w-full py-5 md:py-6 rounded-2xl bg-[#ff462e] text-white flex items-center justify-center gap-4 text-xs md:text-sm font-bold uppercase tracking-[4px] shadow-[0_20px_40px_rgba(255,70,46,0.3)] hover:shadow-[0_25px_50px_rgba(255,70,46,0.4)] transition-all relative overflow-hidden group"
+                  className="w-full py-6 md:py-8 rounded-[2rem] bg-gradient-to-r from-[#ff462e] to-[#c4321e] text-white flex items-center justify-center gap-5 text-sm md:text-base font-bold uppercase tracking-[6px] shadow-[0_25px_60px_rgba(255,70,46,0.3)] hover:shadow-[0_30px_70px_rgba(255,70,46,0.4)] transition-all relative overflow-hidden group/btn"
                 >
                   <motion.div
-                    animate={{ x: isHovered ? 5 : 0 }}
-                    className="flex items-center gap-4"
+                    animate={{ x: isHovered ? 8 : 0 }}
+                    className="flex items-center gap-5"
                   >
                     {language === 'es' ? 'Manifestar Ahora' : 'Manifest Now'}
-                    <ArrowRight size={20} />
+                    <ArrowRight size={24} />
                   </motion.div>
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500" />
                 </button>
               </div>
             </motion.div>

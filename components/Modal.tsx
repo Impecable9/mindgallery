@@ -454,32 +454,30 @@ const Modal: React.FC<ModalProps> = ({
                 <button onClick={() => setViewMode('bedroom')} title="Bedroom" className={`p-2 rounded-full transition-colors ${viewMode === 'bedroom' ? 'bg-white text-black' : 'text-slate-300 hover:text-white hover:bg-white/10'}`}><BedDouble size={16} /></button>
                 <button onClick={() => setViewMode('office')} title="Office" className={`p-2 rounded-full transition-colors ${viewMode === 'office' ? 'bg-white text-black' : 'text-slate-300 hover:text-white hover:bg-white/10'}`}><Briefcase size={16} /></button>
             </div>
-          </div>
-
-          {/* Controls Editor Section */}
-          <div className="w-full md:w-[450px] bg-[#090909]/40 backdrop-blur-2xl border-l border-[rgba(255,255,255,0.08)] flex flex-col h-full z-10 shadow-lg">
+          </div>          {/* Controls Editor Section */}
+          <div className="w-full md:w-[480px] bg-[#050505]/40 backdrop-blur-[50px] border-l border-white/[0.08] flex flex-col h-full z-10 shadow-[-50px_0_100px_rgba(0,0,0,0.5)]">
             
-            <div className="p-5 border-b border-[rgba(255,255,255,0.08)] flex justify-between items-center bg-transparent z-20">
+            <div className="p-6 md:p-8 border-b border-white/[0.08] flex justify-between items-center bg-transparent z-20">
                <div>
-                  <h3 className="text-[#ff462e] text-[10px] font-bold uppercase tracking-[2px] mb-1">{t.modalCustomize}</h3>
-                  <h1 className="text-xl font-serif text-[#f9f9f9] tracking-tight">{t.modalTitle}</h1>
+                  <h3 className="text-[#ff462e] text-[10px] font-bold uppercase tracking-[4px] mb-2">{t.modalCustomize}</h3>
+                  <h1 className="text-2xl font-serif text-white tracking-tight">{t.modalTitle}</h1>
                </div>
-               <div className="flex items-center gap-2">
+               <div className="flex items-center gap-3">
                  <button 
                     onClick={cycleLanguage}
-                    className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-bold border border-transparent hover:border-slate-700"
+                    className="p-2.5 rounded-2xl hover:bg-white/5 text-slate-400 hover:text-white transition-all flex items-center gap-2 text-[10px] font-bold border border-white/5 hover:border-white/20"
                     title="Change Editor Language"
                  >
-                    <Globe size={16} />
+                    <Globe size={14} />
                     {localLanguage.toUpperCase()}
                  </button>
-                 <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
+                 <button onClick={onClose} className="p-2.5 hover:bg-white/5 rounded-2xl transition-all text-slate-400 hover:text-white border border-white/5 hover:border-white/20">
                    <X size={24} />
                  </button>
                </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-10 custom-scrollbar">
               
               <section>
                 <div className="flex items-center gap-2 mb-3 text-slate-300 text-sm font-medium">
@@ -508,51 +506,44 @@ const Modal: React.FC<ModalProps> = ({
               </section>
 
               {/* MOVED AI SECTION UP */}
-              <section className="bg-white/5 p-4 rounded-xl border border-[rgba(255,255,255,0.05)]">
-                 <div className="flex items-center gap-2 mb-3 text-slate-200 text-sm font-medium">
-                    <ImageIcon size={16} className="text-[#ff462e]" />
+              <section className="bg-white/[0.03] p-6 md:p-8 rounded-[2.5rem] border border-white/[0.05] backdrop-blur-2xl relative overflow-hidden group/ai">
+                  {/* Decorative AI Gradient */}
+                  <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[#ff462e]/5 rounded-full blur-[60px] -z-10 group-hover/ai:bg-[#ff462e]/10 transition-colors" />
+
+                 <div className="flex items-center gap-3 mb-6 text-white text-sm font-bold uppercase tracking-widest">
+                    <ImageIcon size={18} className="text-[#ff462e]" />
                     <span>{t.lblBg}</span>
                  </div>
                  
-                 <div className="grid grid-cols-4 gap-2 mb-4">
-                    <button onClick={() => setArtStyle('none')} className={`h-16 rounded-md border text-[10px] flex flex-col items-center justify-center gap-1 ${artStyle === 'none' ? 'border-purple-500 bg-slate-800 text-white' : 'border-slate-700 text-slate-400'}`}><CircleOff size={14}/> Clean</button>
-                    <button onClick={() => setArtStyle('vangogh')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-br from-blue-900 to-yellow-600 border-slate-700 text-white shadow-sm hover:scale-105 transition-transform ${artStyle === 'vangogh' ? 'ring-2 ring-[#ff462e]' : ''}`}>Van Gogh</button>
-                    <button onClick={() => setArtStyle('monet')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-br from-green-300 to-pink-300 text-slate-900 border-slate-700 shadow-sm hover:scale-105 transition-transform ${artStyle === 'monet' ? 'ring-2 ring-[#ff462e]' : ''}`}>Monet</button>
-                    <button onClick={() => setArtStyle('warhol')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-r from-yellow-400 to-pink-500 text-slate-900 border-slate-700 shadow-sm hover:scale-105 transition-transform ${artStyle === 'warhol' ? 'ring-2 ring-[#ff462e]' : ''}`}>Pop Art</button>
+                 <div className="grid grid-cols-4 gap-3 mb-6">
+                    <button onClick={() => setArtStyle('none')} className={`h-16 rounded-[1.2rem] border text-[10px] font-bold uppercase tracking-tighter flex flex-col items-center justify-center gap-2 transition-all ${artStyle === 'none' ? 'border-[#ff462e] bg-[#ff462e]/20 text-white' : 'border-white/10 text-slate-400 hover:border-white/20 text-white'}`}><CircleOff size={16}/> Clean</button>
+                    <button onClick={() => setArtStyle('vangogh')} className={`h-16 rounded-[1.2rem] border text-[10px] font-bold uppercase bg-gradient-to-br from-blue-900 to-yellow-600 border-white/10 text-white shadow-xl hover:scale-105 transition-transform ${artStyle === 'vangogh' ? 'ring-2 ring-[#ff462e]' : ''}`}>Van Gogh</button>
+                    <button onClick={() => setArtStyle('monet')} className={`h-16 rounded-[1.2rem] border text-[10px] font-bold uppercase bg-gradient-to-br from-green-300 to-pink-300 text-slate-900 border-white/10 shadow-xl hover:scale-105 transition-transform ${artStyle === 'monet' ? 'ring-2 ring-[#ff462e]' : ''}`}>Monet</button>
+                    <button onClick={() => setArtStyle('warhol')} className={`h-16 rounded-[1.2rem] border text-[10px] font-bold uppercase bg-gradient-to-r from-yellow-400 to-pink-500 text-slate-900 border-white/10 shadow-xl hover:scale-105 transition-transform ${artStyle === 'warhol' ? 'ring-2 ring-[#ff462e]' : ''}`}>Pop Art</button>
                  </div>
 
-                 <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
-                      <Sparkles size={10} className="text-yellow-400" /> {t.lblAi}
+                 <div className="space-y-4">
+                    <label className="text-[10px] uppercase tracking-[4px] text-[#ff462e]/80 font-bold flex items-center gap-2 mb-2">
+                      <Sparkles size={12} className="text-[#ff462e]" /> {t.lblAi}
                     </label>
-                    <div className="flex gap-2 mb-2">
-                       <button onClick={() => setAiMode('background')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${aiMode === 'background' ? 'text-white border-[rgba(255,70,46,0.7)]' : 'border-slate-700 text-slate-400 hover:text-white'}`} style={aiMode === 'background' ? { background: 'rgba(255,70,46,0.7)' } : {}}>{t.aiModeBg}</button>
-                       <button onClick={() => setAiMode('full')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${aiMode === 'full' ? 'text-white border-[rgba(255,70,46,0.7)]' : 'border-slate-700 text-slate-400 hover:text-white'}`} style={aiMode === 'full' ? { background: 'rgba(255,70,46,0.7)' } : {}}>{t.aiModeFull}</button>
+                    <div className="flex gap-2 p-1 bg-black/40 rounded-2xl border border-white/5">
+                       <button onClick={() => setAiMode('background')} className={`flex-1 text-[10px] font-bold uppercase py-2.5 rounded-xl transition-all ${aiMode === 'background' ? 'bg-[#ff462e] text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}>{t.aiModeBg}</button>
+                       <button onClick={() => setAiMode('full')} className={`flex-1 text-[10px] font-bold uppercase py-2.5 rounded-xl transition-all ${aiMode === 'full' ? 'bg-[#ff462e] text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}>{t.aiModeFull}</button>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                        <input 
                           type="text" 
                           placeholder={t.aiPlaceholder}
                           value={aiPrompt}
                           onChange={(e) => setAiPrompt(e.target.value)}
-                          className="flex-1 bg-[#111111] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ff462e]"
+                          className="flex-1 bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 text-sm text-white focus:outline-none focus:border-[#ff462e] transition-all placeholder:text-white/10 font-serif"
                        />
                        <button 
                          onClick={handleAiGenerate}
                          disabled={isGeneratingAi || !aiPrompt}
-                         className="disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 rounded-lg flex items-center justify-center" style={{ background: '#ff462e' }}
+                         className="disabled:opacity-30 disabled:cursor-not-allowed bg-[#ff462e] text-white px-5 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-[#ff462e]/20 transition-all hover:scale-105"
                        >
-                         {isGeneratingAi ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-                       </button>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                       {AI_PROMPTS.slice(0, 3).map(p => (
-                          <button key={p} onClick={() => setAiPrompt(p)} className="text-[9px] bg-slate-900 text-slate-400 px-2 py-1 rounded-full hover:bg-slate-800 hover:text-white transition-colors border border-slate-700">
-                             {p.split(' ')[0]}...
-                          </button>
-                       ))}
-                       <button onClick={() => setAiPrompt("Elegant gold calligraphy saying 'Worthy'")} className="text-[9px] bg-slate-900 text-slate-400 px-2 py-1 rounded-full hover:bg-slate-800 hover:text-white transition-colors border border-slate-700">
-                          Lettering
+                         {isGeneratingAi ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
                        </button>
                     </div>
                  </div>
