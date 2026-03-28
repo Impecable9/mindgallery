@@ -112,326 +112,304 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen font-sans transition-colors duration-700 ${isNegativeMode ? 'text-gray-200' : 'text-slate-900'}`}>
-      
-      {/* Dynamic Animated Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Gradient Layer */}
-        <div className={`absolute inset-0 animate-gradient-xy transition-opacity duration-1000 ${
-          isNegativeMode 
-            ? 'bg-gradient-to-br from-slate-950 via-gray-900 to-black opacity-100' 
-            : 'bg-gradient-to-br from-rose-50 via-sky-50 to-white opacity-100'
-        }`} />
-        
-        {/* Blob Overlay (Light Mode) */}
-        {!isNegativeMode && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
-            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply animate-pulse" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply animate-pulse delay-1000" />
-          </motion.div>
-        )}
+    <div className="min-h-screen font-sans" style={{ background: '#090909', color: '#f9f9f9' }}>
 
-        {/* Blob Overlay (Dark Mode) */}
-        {isNegativeMode && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
-             <div className="absolute top-[20%] right-[20%] w-[60%] h-[60%] bg-purple-900/10 rounded-full blur-[150px]" />
-             <div className="absolute bottom-[10%] left-[10%] w-[40%] h-[40%] bg-gray-800/20 rounded-full blur-[100px]" />
-          </motion.div>
-        )}
-        
-        {/* PRO MAX Particle System */}
+      {/* Ambient glow blobs — always dark */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[15%] right-[10%] w-[40%] h-[40%] rounded-full blur-[180px]"
+             style={{ background: isNegativeMode ? 'rgba(255,70,46,0.04)' : 'rgba(255,70,46,0.06)' }} />
+        <div className="absolute bottom-[10%] left-[5%] w-[30%] h-[30%] rounded-full blur-[140px]"
+             style={{ background: 'rgba(255,70,46,0.03)' }} />
         <ParticleBackground isNegativeMode={isNegativeMode} />
       </div>
 
-      {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 backdrop-blur-xl border-b transition-colors duration-500 shadow-sm ${
-        isNegativeMode ? 'bg-black/40 border-white/5' : 'bg-white/40 border-white/20'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <div 
-            className="flex items-center gap-2 cursor-pointer" 
-            onClick={() => setViewMode('GALLERY')}
-          >
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-lg transition-colors ${
-              isNegativeMode ? 'bg-gray-800 ring-1 ring-white/10' : 'bg-gradient-to-br from-rose-400 to-violet-500 ring-1 ring-white/20'
-            }`}>
-              <Layers className="text-white w-5 h-5" />
-            </div>
-            <span className={`font-serif text-xl font-bold tracking-tight ${isNegativeMode ? 'text-white' : 'text-slate-800'}`}>
-              {t.navTitle}
-            </span>
+      {/* ── Phoenix Wall Navbar ── */}
+      <nav className="fixed top-0 w-full z-50 h-16 flex items-center px-6 md:px-10"
+           style={{ background: 'rgba(9,9,9,0.72)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(234,234,234,0.07)' }}>
+
+        {/* Logo / Brand */}
+        <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => setViewMode('GALLERY')}>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+               style={{ background: 'rgba(255,70,46,0.12)', border: '1px solid rgba(255,70,46,0.3)' }}>
+            <Layers className="w-4 h-4" style={{ color: '#ff462e' }} />
+          </div>
+          <span className="text-lg font-display tracking-tight" style={{ color: '#f9f9f9', fontFamily: "'Yeseva One', serif" }}>
+            Mind Gallery
+          </span>
+        </div>
+
+        {/* Center pill nav */}
+        <div className="hidden md:flex items-center gap-1 mx-auto rounded-full px-2 py-1.5"
+             style={{ background: 'rgba(9,9,9,0.4)', border: '1px solid rgba(234,234,234,0.1)', backdropFilter: 'blur(12px)' }}>
+          {([
+            { id: 'GALLERY', label: t.navGallery, icon: <Grid size={14}/> },
+            { id: 'GUIDE',   label: t.navGuide,   icon: <Info size={14}/> },
+            { id: 'CHAT',    label: t.navChat,     icon: <MessageSquare size={14}/> },
+          ] as const).map(item => (
+            <button
+              key={item.id}
+              onClick={() => setViewMode(item.id)}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all"
+              style={{
+                color: viewMode === item.id ? '#f9f9f9' : '#7f7f80',
+                background: viewMode === item.id ? 'rgba(255,70,46,0.12)' : 'transparent',
+                border: viewMode === item.id ? '1px solid rgba(255,70,46,0.3)' : '1px solid transparent',
+                boxShadow: viewMode === item.id ? '0 0 12px rgba(255,70,46,0.15)' : 'none',
+                fontFamily: "'Comfortaa', sans-serif",
+              }}
+            >
+              {item.icon}{item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-2 ml-auto md:ml-0">
+          {/* Search */}
+          <div className="hidden lg:flex items-center relative">
+            <Search className="absolute left-3" size={14} style={{ color: '#7f7f80' }} />
+            <input
+              type="text"
+              placeholder={t.lblSearchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 text-sm outline-none"
+              style={{
+                background: 'rgba(249,249,249,0.05)',
+                border: '1px solid rgba(234,234,234,0.1)',
+                borderRadius: '999px',
+                color: '#f9f9f9',
+                fontFamily: "'Comfortaa', sans-serif",
+                width: 180,
+              }}
+            />
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
-             {/* Search Bar */}
-             <div className="hidden md:flex items-center relative">
-                <Search className="absolute left-3 text-slate-400" size={16} />
-                <input 
-                  type="text"
-                  placeholder={t.lblSearchPlaceholder}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`pl-10 pr-4 py-2 rounded-full text-sm border transition-all focus:ring-2 focus:outline-none ${
-                    isNegativeMode 
-                      ? 'bg-white/5 border-white/10 text-white focus:ring-purple-500/30' 
-                      : 'bg-white/50 border-white/40 text-slate-800 focus:ring-rose-500/30'
-                  }`}
-                />
-             </div>
+          {/* Roulette */}
+          <button
+            onClick={() => setIsRouletteOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all group"
+            style={{ background: 'rgba(249,249,249,0.05)', border: '1px solid rgba(234,234,234,0.1)', color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}
+          >
+            <Dices size={16} className="group-hover:rotate-12 transition-transform" />
+            <span className="hidden sm:inline">{t.navRoulette}</span>
+          </button>
 
-             {/* Chat Button */}
-             <button
-               onClick={() => setViewMode('CHAT')}
-               className={`p-2 rounded-full transition-all border flex items-center gap-2 px-3 ${
-                 viewMode === 'CHAT'
-                   ? isNegativeMode ? 'bg-white text-black border-white' : 'bg-slate-900 text-white border-slate-900'
-                   : isNegativeMode ? 'bg-white/10 text-white border-white/20' : 'bg-white/50 text-slate-600 border-white/40'
-               }`}
-             >
-               <MessageSquare size={18} />
-               <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">{t.navChat}</span>
-             </button>
+          {/* Shop CTA */}
+          <button
+            onClick={() => {
+              const pool = THOUGHTS_DATA.filter(t => !t.isPremium);
+              const pick = pool[Math.floor(Math.random() * pool.length)] || THOUGHTS_DATA[0];
+              setViewMode('GALLERY');
+              setSelectedThought(pick);
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all"
+            style={{
+              background: 'rgba(255,70,46,0.12)',
+              border: '1px solid rgba(255,70,46,0.4)',
+              color: '#f9f9f9',
+              fontFamily: "'Comfortaa', sans-serif",
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,70,46,0.25)';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,70,46,0.8)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,70,46,0.12)';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,70,46,0.4)';
+            }}
+          >
+            <ShoppingBag size={14} />
+            <span className="hidden sm:inline">Shop</span>
+          </button>
 
-             {/* Shop Button */}
-             <button
-               onClick={() => {
-                 const firstThought = THOUGHTS_DATA[0];
-                 if (firstThought) handleOpenPurchase(firstThought, '');
-               }}
-               title="Open Shop"
-               className={`p-2 rounded-full transition-all border flex items-center gap-2 px-3 ${
-                 isNegativeMode ? 'bg-white/10 text-white border-white/20' : 'bg-white/50 text-slate-600 border-white/40'
-               }`}
-             >
-               <ShoppingBag size={18} />
-               <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">Shop</span>
-             </button>
+          {/* Mode toggle */}
+          <button
+            onClick={() => setIsNegativeMode(!isNegativeMode)}
+            title={isNegativeMode ? "Expansive Mode" : "Limiting Beliefs Mode"}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
+            style={{ background: 'rgba(249,249,249,0.05)', border: '1px solid rgba(234,234,234,0.1)', color: isNegativeMode ? '#fde047' : '#7f7f80' }}
+          >
+            {isNegativeMode
+              ? <Sun size={16} className="fill-current animate-[spin_10s_linear_infinite]" />
+              : <Moon size={16} className="fill-current" />}
+          </button>
 
-             {/* ROULETTE BUTTON - PRO MAX */}
-             <div className="hidden sm:block">
-               <ShineBorder>
-                 <button
-                   onClick={() => setIsRouletteOpen(true)}
-                   className={`p-2 rounded-full transition-all border group items-center gap-2 px-3 ${
-                     isNegativeMode 
-                       ? 'bg-purple-950/40 text-purple-300 border-white/5 hover:bg-purple-900/40' 
-                       : 'bg-white/80 text-violet-600 border-white/40 hover:bg-white'
-                   }`}
-                 >
-                   <Dices size={20} className="group-hover:rotate-12 transition-transform" />
-                   <span className="text-xs font-bold uppercase tracking-wider hidden md:inline">{t.navRoulette}</span>
-                 </button>
-               </ShineBorder>
-             </div>
-
-             {/* Language Dropdown */}
-             <div className="relative">
-                <button
-                  onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                  className={`p-2 rounded-full transition-all flex items-center gap-2 text-xs font-bold border min-w-[50px] sm:min-w-[80px] justify-between ${
-                    isNegativeMode 
-                      ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' 
-                      : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
-                  }`}
+          {/* Language */}
+          <div className="relative">
+            <button
+              onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold transition-all"
+              style={{ background: 'rgba(249,249,249,0.05)', border: '1px solid rgba(234,234,234,0.1)', color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}
+            >
+              <span className="text-base leading-none">{currentLang.flag}</span>
+              <span className="hidden sm:inline">{currentLang.code.toUpperCase()}</span>
+              <ChevronDown size={12} className={`transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <AnimatePresence>
+              {isLangMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  className="absolute top-full right-0 mt-2 w-32 rounded-xl overflow-hidden"
+                  style={{ background: '#1a1a1a', border: '1px solid rgba(234,234,234,0.1)', backdropFilter: 'blur(20px)', zIndex: 200 }}
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="text-lg leading-none">{currentLang.flag}</span>
-                    <span className="hidden sm:inline">{currentLang.code.toUpperCase()}</span>
-                  </span>
-                  <ChevronDown size={14} className={`transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                <AnimatePresence>
-                  {isLangMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className={`absolute top-full right-0 mt-2 w-32 rounded-xl shadow-xl overflow-hidden border backdrop-blur-xl ${
-                        isNegativeMode 
-                          ? 'bg-black/80 border-white/10' 
-                          : 'bg-white/90 border-white/20'
-                      }`}
+                  {languages.map((l) => (
+                    <button
+                      key={l.code}
+                      onClick={() => { setLanguage(l.code); setIsLangMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-xs font-medium transition-colors"
+                      style={{
+                        color: language === l.code ? '#f9f9f9' : '#7f7f80',
+                        background: language === l.code ? 'rgba(255,70,46,0.1)' : 'transparent',
+                        fontFamily: "'Comfortaa', sans-serif",
+                      }}
                     >
-                      {languages.map((l) => (
-                        <button
-                          key={l.code}
-                          onClick={() => {
-                            setLanguage(l.code);
-                            setIsLangMenuOpen(false);
-                          }}
-                          className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
-                            language === l.code
-                              ? isNegativeMode ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-900'
-                              : isNegativeMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                          }`}
-                        >
-                          <span className="text-lg leading-none">{l.flag}</span>
-                          {l.label}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-             </div>
-            
-             {/* Negative Mode Toggle (Sun/Moon) */}
-             <button
-               onClick={() => setIsNegativeMode(!isNegativeMode)}
-               className={`p-2 rounded-full transition-all border group ${
-                 isNegativeMode 
-                   ? 'bg-white/10 text-yellow-300 border-white/20 hover:bg-white/20 hover:scale-110 shadow-[0_0_15px_rgba(253,224,71,0.2)]' 
-                   : 'bg-indigo-950/5 text-indigo-900 border-indigo-900/10 hover:bg-indigo-950/10 hover:scale-110'
-               }`}
-               title={isNegativeMode ? "Switch to Expansive Mode" : "Switch to Limiting Beliefs Mode"}
-             >
-                {isNegativeMode ? (
-                  <Sun size={20} className="fill-current animate-[spin_10s_linear_infinite]" />
-                ) : (
-                  <Moon size={20} className="fill-current group-hover:-rotate-12 transition-transform" />
-                )}
-             </button>
-
-             {/* View Mode Toggle */}
-             <button 
-               onClick={() => setViewMode(viewMode === 'GALLERY' ? 'GUIDE' : 'GALLERY')}
-               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                 isNegativeMode
-                   ? 'bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10'
-                   : 'bg-white/50 hover:bg-white/80 text-slate-600 border border-white/40'
-               }`}
-             >
-               {viewMode === 'GALLERY' ? <Info size={16} /> : <Grid size={16} />}
-               <span className="hidden sm:inline">{viewMode === 'GALLERY' ? t.navGuide : t.navGallery}</span>
-             </button>
+                      <span className="text-base leading-none">{l.flag}</span>{l.label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </nav>
 
-      {/* Global Design Toolbar */}
-      {viewMode === 'GALLERY' && !isNegativeMode && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 bg-white/70 backdrop-blur-xl border border-white/40 rounded-full px-6 py-2 shadow-xl flex items-center gap-6 overflow-x-auto max-w-[90vw]">
-           <div className="flex items-center gap-2 border-r border-slate-200 pr-6">
-             <Type size={14} className="text-slate-400" />
-             <div className="flex gap-1">
-               {(['serif', 'sans', 'classic', 'hand'] as FontFamily[]).map(f => (
-                 <button 
-                   key={f}
-                   onClick={() => setGlobalStyle(s => ({...s, font: f}))}
-                   className={`w-6 h-6 rounded flex items-center justify-center text-[10px] transition-all ${globalStyle.font === f ? 'bg-slate-900 text-white font-bold' : 'text-slate-400 hover:text-slate-900'}`}
-                 >
-                   Aa
-                 </button>
-               ))}
-             </div>
-           </div>
-
-           <div className="flex items-center gap-2 border-r border-slate-200 pr-6">
-             <Palette size={14} className="text-slate-400" />
-             <div className="flex gap-2">
-               {(Object.keys(COLOR_MAP) as TextColor[]).map(c => (
-                 <button
-                   key={c}
-                   onClick={() => setGlobalStyle(s => ({...s, color: c}))}
-                   className={`w-4 h-4 rounded-full transition-all ${globalStyle.color === c ? 'ring-2 ring-slate-400 scale-110' : 'opacity-50 hover:opacity-100'}`}
-                   style={{ backgroundColor: c === 'black' ? '#0f172a' : c === 'slate' ? '#475569' : c === 'rose' ? '#be123c' : c === 'emerald' ? '#065f46' : c === 'violet' ? '#5b21b6' : '#b45309' }}
-                 />
-               ))}
-             </div>
-           </div>
-
-           <div className="flex items-center gap-2">
-              <button onClick={() => setGlobalStyle(s => ({...s, align: 'left'}))} className={`p-1 rounded ${globalStyle.align === 'left' ? 'text-slate-900 bg-slate-200' : 'text-slate-400 hover:text-slate-600'}`}><AlignLeft size={14}/></button>
-              <button onClick={() => setGlobalStyle(s => ({...s, align: 'center'}))} className={`p-1 rounded ${globalStyle.align === 'center' ? 'text-slate-900 bg-slate-200' : 'text-slate-400 hover:text-slate-600'}`}><AlignCenter size={14}/></button>
-              <button onClick={() => setGlobalStyle(s => ({...s, align: 'right'}))} className={`p-1 rounded ${globalStyle.align === 'right' ? 'text-slate-900 bg-slate-200' : 'text-slate-400 hover:text-slate-600'}`}><AlignRight size={14}/></button>
-           </div>
+      {/* Design Toolbar */}
+      {viewMode === 'GALLERY' && (
+        <div className="fixed top-[68px] left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 px-5 py-2 rounded-full overflow-x-auto max-w-[90vw]"
+             style={{ background: 'rgba(17,17,17,0.8)', border: '1px solid rgba(234,234,234,0.08)', backdropFilter: 'blur(16px)' }}>
+          <div className="flex items-center gap-1.5 pr-4" style={{ borderRight: '1px solid rgba(234,234,234,0.1)' }}>
+            <Type size={12} style={{ color: '#7f7f80' }} />
+            {(['serif', 'sans', 'classic', 'hand'] as FontFamily[]).map(f => (
+              <button
+                key={f}
+                onClick={() => setGlobalStyle(s => ({...s, font: f}))}
+                className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold transition-all"
+                style={{
+                  background: globalStyle.font === f ? '#ff462e' : 'transparent',
+                  color: globalStyle.font === f ? '#fff' : '#7f7f80',
+                  fontFamily: "'Comfortaa', sans-serif",
+                }}
+              >Aa</button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 pr-4" style={{ borderRight: '1px solid rgba(234,234,234,0.1)' }}>
+            <Palette size={12} style={{ color: '#7f7f80' }} />
+            {(Object.keys(COLOR_MAP) as TextColor[]).map(c => (
+              <button
+                key={c}
+                onClick={() => setGlobalStyle(s => ({...s, color: c}))}
+                className="w-4 h-4 rounded-full transition-all"
+                style={{
+                  backgroundColor: c === 'black' ? '#f9f9f9' : c === 'slate' ? '#94a3b8' : c === 'rose' ? '#fb7185' : c === 'emerald' ? '#34d399' : c === 'violet' ? '#a78bfa' : '#fbbf24',
+                  outline: globalStyle.color === c ? '2px solid #ff462e' : 'none',
+                  outlineOffset: '2px',
+                  transform: globalStyle.color === c ? 'scale(1.2)' : 'scale(1)',
+                }}
+              />
+            ))}
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setGlobalStyle(s => ({...s, align: 'left'}))}
+              className="p-1 rounded transition-all"
+              style={{ color: globalStyle.align === 'left' ? '#ff462e' : '#7f7f80' }}>
+              <AlignLeft size={13}/>
+            </button>
+            <button onClick={() => setGlobalStyle(s => ({...s, align: 'center'}))}
+              className="p-1 rounded transition-all"
+              style={{ color: globalStyle.align === 'center' ? '#ff462e' : '#7f7f80' }}>
+              <AlignCenter size={13}/>
+            </button>
+            <button onClick={() => setGlobalStyle(s => ({...s, align: 'right'}))}
+              className="p-1 rounded transition-all"
+              style={{ color: globalStyle.align === 'right' ? '#ff462e' : '#7f7f80' }}>
+              <AlignRight size={13}/>
+            </button>
+          </div>
         </div>
       )}
 
       {/* Main Content Area */}
-      <main className="pt-24 pb-20 px-4 md:px-6 z-10 relative max-w-[1600px] mx-auto">
+      <main className="pt-28 pb-20 px-4 md:px-10 z-10 relative max-w-[1600px] mx-auto">
         
         {viewMode === 'GALLERY' ? (
           <>
             {/* New Hero Section showing mockups */}
-            <HeroSection isNegativeMode={isNegativeMode} language={language} globalConfig={globalConfig} onShopClick={() => { const firstThought = THOUGHTS_DATA[0]; if (firstThought) handleOpenPurchase(firstThought, ''); }} />
+            <HeroSection
+              isNegativeMode={isNegativeMode}
+              language={language}
+              globalConfig={globalConfig}
+              onShopClick={() => {
+                const pool = THOUGHTS_DATA.filter(t => !t.isPremium);
+                const pick = pool[Math.floor(Math.random() * pool.length)] || THOUGHTS_DATA[0];
+                setSelectedThought(pick);
+              }}
+            />
 
             {/* Context Header */}
             <div className="text-center mb-8">
-               <motion.h2 
+               <motion.h2
                  key={isNegativeMode ? 'neg' : 'pos'}
                  initial={{ opacity: 0, y: 10 }}
                  animate={{ opacity: 1, y: 0 }}
-                 className={`text-3xl font-serif mb-2 ${isNegativeMode ? 'text-white' : 'text-slate-800'}`}
+                 className="text-3xl mb-2"
+                 style={{ fontFamily: "'Yeseva One', serif", color: '#f9f9f9' }}
                >
                  {isNegativeMode ? t.heroTitleNeg : t.heroTitlePos}
                </motion.h2>
-               <p className={`text-sm ${isNegativeMode ? 'text-gray-400' : 'text-slate-500'}`}>
+               <p className="text-sm" style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}>
                  {isNegativeMode ? t.heroDescNeg : t.heroDescPos}
                </p>
             </div>
 
             {/* Category Filter */}
             <div className="mb-6 flex flex-wrap gap-2 justify-center">
-              <button
-                onClick={() => { setSelectedCategory('ALL'); setSelectedEmotion('ALL'); }}
-                className={`px-4 py-2 rounded-full text-sm transition-all border backdrop-blur-sm ${
-                  selectedCategory === 'ALL'
-                    ? isNegativeMode ? 'bg-white text-black border-white' : 'bg-slate-900 text-white border-slate-900'
-                    : isNegativeMode ? 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30' : 'bg-white/40 text-slate-500 border-white/40 hover:bg-white/60'
-                }`}
-              >
-                {t.filterAll}
-              </button>
-              {Object.values(CategoryType).map((cat) => {
-                 const theme = CATEGORY_THEMES[cat];
-                 const isSelected = selectedCategory === cat;
-                 return (
+              {[{ id: 'ALL', label: t.filterAll }, ...Object.values(CategoryType).map(cat => ({ id: cat, label: t.cat[cat], icon: CATEGORY_THEMES[cat]?.icon }))].map(item => {
+                const isSelected = selectedCategory === item.id;
+                return (
                   <button
-                    key={cat}
-                    onClick={() => { setSelectedCategory(cat); setSelectedEmotion('ALL'); }}
-                    className={`px-4 py-2 rounded-full text-sm transition-all border flex items-center gap-2 backdrop-blur-sm ${
-                      isSelected
-                        ? isNegativeMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-slate-900 border-slate-300 shadow-md'
-                        : isNegativeMode ? 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10' : 'bg-white/40 text-slate-500 border-white/40 hover:bg-white/60'
-                    }`}
+                    key={item.id}
+                    onClick={() => { setSelectedCategory(item.id as any); setSelectedEmotion('ALL'); }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all"
+                    style={{
+                      fontFamily: "'Comfortaa', sans-serif",
+                      background: isSelected ? 'rgba(255,70,46,0.12)' : 'rgba(249,249,249,0.04)',
+                      border: isSelected ? '1px solid rgba(255,70,46,0.4)' : '1px solid rgba(234,234,234,0.1)',
+                      color: isSelected ? '#f9f9f9' : '#7f7f80',
+                      boxShadow: isSelected ? '0 0 12px rgba(255,70,46,0.15)' : 'none',
+                    }}
                   >
-                    {isSelected && theme.icon}
-                    {t.cat[cat]}
+                    {isSelected && (item as any).icon}
+                    {item.label}
                   </button>
-                 );
+                );
               })}
             </div>
 
             {/* Emotion Sub-Filter */}
             {selectedCategory === CategoryType.EMOTIONS && (
                <div className="mb-10 max-w-4xl mx-auto">
-                  <div className={`p-4 rounded-2xl border transition-colors ${isNegativeMode ? 'bg-white/5 border-white/10' : 'bg-white/40 border-white/40'}`}>
-                     <div className="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-widest opacity-50 justify-center">
+                  <div className="p-4 rounded-xl" style={{ background: 'rgba(249,249,249,0.03)', border: '1px solid rgba(234,234,234,0.08)' }}>
+                     <div className="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-widest justify-center"
+                          style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}>
                         <Sparkles size={12} /> Filter by Emotion
                      </div>
                      <div className="flex flex-wrap gap-2 justify-center">
-                        <button
-                           onClick={() => setSelectedEmotion('ALL')}
-                           className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
-                              selectedEmotion === 'ALL'
-                                 ? isNegativeMode ? 'bg-pink-500 text-white' : 'bg-pink-500 text-white'
-                                 : isNegativeMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-white/50 text-slate-600 hover:bg-white/80'
-                           }`}
-                        >
-                           All Emotions
-                        </button>
-                        {emotionTags.map(tag => (
+                        {['ALL', ...emotionTags].map(tag => (
                            <button
                               key={tag as string}
-                              onClick={() => setSelectedEmotion(tag as string)}
-                              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
-                                 selectedEmotion === tag
-                                    ? isNegativeMode ? 'bg-pink-500 text-white' : 'bg-pink-500 text-white'
-                                    : isNegativeMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-white/50 text-slate-600 hover:bg-white/80'
-                              }`}
+                              onClick={() => setSelectedEmotion(tag === 'ALL' ? 'ALL' : tag as string)}
+                              className="px-3 py-1 rounded-full text-xs font-medium transition-all"
+                              style={{
+                                fontFamily: "'Comfortaa', sans-serif",
+                                background: selectedEmotion === tag ? 'rgba(255,70,46,0.15)' : 'rgba(249,249,249,0.04)',
+                                border: selectedEmotion === tag ? '1px solid rgba(255,70,46,0.4)' : '1px solid rgba(234,234,234,0.08)',
+                                color: selectedEmotion === tag ? '#f9f9f9' : '#7f7f80',
+                              }}
                            >
-                              {tag}
+                              {tag === 'ALL' ? 'All Emotions' : tag}
                            </button>
                         ))}
                      </div>
@@ -473,7 +451,13 @@ const App: React.FC = () => {
                       isNegativeMode={isNegativeMode}
                       language={language}
                       onSearch={(query) => setSearchQuery(query)}
-                      onPurchase={handleOpenPurchase}
+                      onPurchase={(t) => {
+                        // Open Studio first so the user designs their piece;
+                        // the Studio's "Collect" button then calls handleOpenPurchase
+                        // with the generated high-quality artwork.
+                        setRouletteInitialNegative(false);
+                        setSelectedThought(t);
+                      }}
                     />
                   );
                 })}
@@ -482,18 +466,79 @@ const App: React.FC = () => {
 
             {/* Empty State */}
             {filteredThoughts.length === 0 && (
-               <div className="text-center py-20 opacity-50">
-                  <Search size={48} className="mx-auto mb-4" />
-                  <p>{t.emptyState}</p>
+               <div className="text-center py-20" style={{ color: '#7f7f80' }}>
+                  <Search size={48} className="mx-auto mb-4 opacity-30" />
+                  <p style={{ fontFamily: "'Comfortaa', sans-serif" }}>{t.emptyState}</p>
                </div>
             )}
+
+            {/* ── Neuroesthetic Section ── */}
+            <div className="mt-24 mb-8">
+              <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(234,234,234,0.08)', background: 'rgba(17,17,17,0.6)' }}>
+                {/* Top accent bar */}
+                <div className="h-[2px] w-full" style={{ background: 'linear-gradient(90deg, transparent, #ff462e 40%, transparent)' }} />
+                <div className="p-10 md:p-16">
+                  <div className="text-xs font-bold uppercase tracking-[0.2em] mb-6" style={{ color: '#ff462e', fontFamily: "'Comfortaa', sans-serif" }}>
+                    Neuroaesthetics
+                  </div>
+                  <h2 className="text-3xl md:text-5xl mb-6 leading-tight" style={{ fontFamily: "'Yeseva One', serif", color: '#f9f9f9', letterSpacing: '-0.5px' }}>
+                    From thought to space.<br/>
+                    <span style={{ color: '#ff462e' }}>The science of what you hang on your walls.</span>
+                  </h2>
+                  <div className="grid md:grid-cols-3 gap-8 mt-10">
+                    {[
+                      {
+                        step: '01',
+                        title: 'The Belief',
+                        desc: 'Every thought carries an energetic signature. A limiting belief — "I am not enough" — contracts your nervous system. An expansive one expands it.'
+                      },
+                      {
+                        step: '02',
+                        title: 'The Visual',
+                        desc: 'When you transform that belief into a visual piece, your brain processes it differently. You see it every day. It rewires the default narrative — slowly, quietly, powerfully.'
+                      },
+                      {
+                        step: '03',
+                        title: 'The Space',
+                        desc: 'Your environment is your extended mind. Phoenix Wall pieces are designed to make the invisible visible — turning your walls into a neuroaesthetic practice.'
+                      },
+                    ].map(item => (
+                      <div key={item.step} className="flex flex-col gap-3">
+                        <div className="text-4xl font-bold" style={{ fontFamily: "'Yeseva One', serif", color: 'rgba(255,70,46,0.2)' }}>{item.step}</div>
+                        <h3 className="text-lg font-semibold" style={{ fontFamily: "'Comfortaa', sans-serif", color: '#f9f9f9' }}>{item.title}</h3>
+                        <p className="text-sm leading-relaxed" style={{ fontFamily: "'Comfortaa', sans-serif", color: '#7f7f80' }}>{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-10">
+                    <button
+                      onClick={() => {
+                        const pool = THOUGHTS_DATA.filter(t => !t.isPremium);
+                        const pick = pool[Math.floor(Math.random() * pool.length)] || THOUGHTS_DATA[0];
+                        setSelectedThought(pick);
+                      }}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
+                      style={{
+                        background: 'rgba(255,70,46,0.12)',
+                        border: '1px solid rgba(255,70,46,0.4)',
+                        color: '#f9f9f9',
+                        fontFamily: "'Comfortaa', sans-serif",
+                      }}
+                    >
+                      <Sparkles size={14} style={{ color: '#ff462e' }} />
+                      Design Your Piece
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </>
         ) : viewMode === 'GUIDE' ? (
           <ConceptGuide />
         ) : viewMode === 'CHAT' ? (
-          <ChatOracle 
-            language={language} 
-            isNegativeMode={isNegativeMode} 
+          <ChatOracle
+            language={language}
+            isNegativeMode={isNegativeMode}
             thoughts={THOUGHTS_DATA}
             onSelectThought={(thought) => {
               setSelectedThought(thought);
@@ -502,6 +547,63 @@ const App: React.FC = () => {
           />
         ) : null}
       </main>
+
+      {/* ── Phoenix Wall Footer ── */}
+      <footer style={{ background: '#050505', borderTop: '2px solid #ff462e' }}>
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-14 grid md:grid-cols-3 gap-10">
+          {/* Brand */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,70,46,0.12)', border: '1px solid rgba(255,70,46,0.3)' }}>
+                <Layers className="w-4 h-4" style={{ color: '#ff462e' }} />
+              </div>
+              <span className="text-lg" style={{ fontFamily: "'Yeseva One', serif", color: '#f9f9f9' }}>Mind Gallery</span>
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}>
+              Smart Art for Inspired Spaces.<br/>
+              Transform your beliefs into wall art.
+            </p>
+            <p className="text-xs" style={{ color: 'rgba(249,249,249,0.3)', fontFamily: "'Comfortaa', sans-serif" }}>
+              Part of <span style={{ color: '#ff462e' }}>Phoenix Wall®</span> · Spain & Europe
+            </p>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col gap-3">
+            <div className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}>Explore</div>
+            {[
+              { label: 'Gallery', action: () => setViewMode('GALLERY') },
+              { label: 'Concept Guide', action: () => setViewMode('GUIDE') },
+              { label: 'AI Oracle', action: () => setViewMode('CHAT') },
+              { label: 'Shop Prints', action: () => { const p = THOUGHTS_DATA[0]; setSelectedThought(p); } },
+            ].map(item => (
+              <button key={item.label} onClick={item.action}
+                className="text-sm text-left transition-colors w-fit"
+                style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}
+                onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = '#f9f9f9'}
+                onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = '#7f7f80'}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Products */}
+          <div className="flex flex-col gap-3">
+            <div className="text-xs font-bold uppercase tracking-[0.15em] mb-2" style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}>Products</div>
+            {['Art Prints', 'Framed Art', 'Canvas', 'Clothing', 'Phone Cases', 'Mugs'].map(item => (
+              <span key={item} className="text-sm" style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif" }}>{item}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="px-6 md:px-10 py-5" style={{ borderTop: '1px solid rgba(234,234,234,0.06)' }}>
+          <p className="text-xs text-center" style={{ color: 'rgba(249,249,249,0.3)', fontFamily: "'Comfortaa', sans-serif" }}>
+            © {new Date().getFullYear()} Phoenix Wall® · Mind Gallery · All rights reserved
+          </p>
+        </div>
+      </footer>
 
       {/* Editor Modal */}
       <Modal 

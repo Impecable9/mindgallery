@@ -513,9 +513,9 @@ const Modal: React.FC<ModalProps> = ({
                  
                  <div className="grid grid-cols-4 gap-2 mb-4">
                     <button onClick={() => setArtStyle('none')} className={`h-16 rounded-md border text-[10px] flex flex-col items-center justify-center gap-1 ${artStyle === 'none' ? 'border-purple-500 bg-slate-800 text-white' : 'border-slate-700 text-slate-400'}`}><CircleOff size={14}/> Clean</button>
-                    <button onClick={() => setArtStyle('vangogh')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-br from-blue-900 to-yellow-600 border-slate-700 text-white shadow-sm hover:scale-105 transition-transform ${artStyle === 'vangogh' ? 'ring-2 ring-purple-500' : ''}`}>Van Gogh</button>
-                    <button onClick={() => setArtStyle('monet')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-br from-green-300 to-pink-300 text-slate-900 border-slate-700 shadow-sm hover:scale-105 transition-transform ${artStyle === 'monet' ? 'ring-2 ring-purple-500' : ''}`}>Monet</button>
-                    <button onClick={() => setArtStyle('warhol')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-r from-yellow-400 to-pink-500 text-slate-900 border-slate-700 shadow-sm hover:scale-105 transition-transform ${artStyle === 'warhol' ? 'ring-2 ring-purple-500' : ''}`}>Pop Art</button>
+                    <button onClick={() => setArtStyle('vangogh')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-br from-blue-900 to-yellow-600 border-slate-700 text-white shadow-sm hover:scale-105 transition-transform ${artStyle === 'vangogh' ? 'ring-2 ring-[#ff462e]' : ''}`}>Van Gogh</button>
+                    <button onClick={() => setArtStyle('monet')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-br from-green-300 to-pink-300 text-slate-900 border-slate-700 shadow-sm hover:scale-105 transition-transform ${artStyle === 'monet' ? 'ring-2 ring-[#ff462e]' : ''}`}>Monet</button>
+                    <button onClick={() => setArtStyle('warhol')} className={`h-16 rounded-md border text-[10px] bg-gradient-to-r from-yellow-400 to-pink-500 text-slate-900 border-slate-700 shadow-sm hover:scale-105 transition-transform ${artStyle === 'warhol' ? 'ring-2 ring-[#ff462e]' : ''}`}>Pop Art</button>
                  </div>
 
                  <div className="space-y-2">
@@ -523,8 +523,8 @@ const Modal: React.FC<ModalProps> = ({
                       <Sparkles size={10} className="text-yellow-400" /> {t.lblAi}
                     </label>
                     <div className="flex gap-2 mb-2">
-                       <button onClick={() => setAiMode('background')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${aiMode === 'background' ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-700 text-slate-400 hover:text-white'}`}>{t.aiModeBg}</button>
-                       <button onClick={() => setAiMode('full')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${aiMode === 'full' ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-700 text-slate-400 hover:text-white'}`}>{t.aiModeFull}</button>
+                       <button onClick={() => setAiMode('background')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${aiMode === 'background' ? 'text-white border-[rgba(255,70,46,0.7)]' : 'border-slate-700 text-slate-400 hover:text-white'}`} style={aiMode === 'background' ? { background: 'rgba(255,70,46,0.7)' } : {}}>{t.aiModeBg}</button>
+                       <button onClick={() => setAiMode('full')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${aiMode === 'full' ? 'text-white border-[rgba(255,70,46,0.7)]' : 'border-slate-700 text-slate-400 hover:text-white'}`} style={aiMode === 'full' ? { background: 'rgba(255,70,46,0.7)' } : {}}>{t.aiModeFull}</button>
                     </div>
                     <div className="flex gap-2">
                        <input 
@@ -537,7 +537,7 @@ const Modal: React.FC<ModalProps> = ({
                        <button 
                          onClick={handleAiGenerate}
                          disabled={isGeneratingAi || !aiPrompt}
-                         className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 rounded-lg flex items-center justify-center"
+                         className="disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,70,46,0.7)' }}
                        >
                          {isGeneratingAi ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                        </button>
@@ -662,8 +662,8 @@ const Modal: React.FC<ModalProps> = ({
               </section>
 
               {/* GUIDE SECTION */}
-              <section className="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/30">
-                 <div className="flex items-center gap-2 mb-3 text-indigo-300 text-sm font-medium">
+              <section className="p-4 rounded-xl" style={{ background: 'rgba(255,70,46,0.06)', border: '1px solid rgba(255,70,46,0.2)' }}>
+                 <div className="flex items-center gap-2 mb-3 text-sm font-medium" style={{ color: 'rgba(255,130,100,0.9)' }}>
                     <BookOpen size={16} />
                     <span>Interpretation Guide</span>
                  </div>
@@ -676,7 +676,7 @@ const Modal: React.FC<ModalProps> = ({
                        <button 
                           onClick={handleGenerateGuide}
                           disabled={isGeneratingGuide}
-                          className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                          className="w-full py-2 text-white rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50" style={{ background: 'rgba(255,70,46,0.6)', border: '1px solid rgba(255,70,46,0.4)' }}
                        >
                           {isGeneratingGuide ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                           Generate Guide
@@ -765,7 +765,7 @@ const Modal: React.FC<ModalProps> = ({
                    <button 
                      onClick={handleDownload}
                      disabled={isDownloading}
-                     className="w-full py-4 rounded-xl font-bold text-sm tracking-wide uppercase shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 bg-white text-slate-900 hover:bg-slate-100"
+                     className="w-full py-4 rounded-full font-bold text-sm tracking-wide uppercase shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-pw-text border border-pw-border hover:border-[rgba(234,234,234,0.3)]" style={{ background: 'rgba(249,249,249,0.08)', fontFamily: "'Comfortaa', sans-serif" }}
                    >
                      {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
                      {t.btnDownload} {downloadFormat.toUpperCase()}
@@ -773,18 +773,33 @@ const Modal: React.FC<ModalProps> = ({
                    
                    {/* BUY THIS THOUGHT */}
                    <button
-                     onClick={() => {
-                       if (onOpenPurchase && thought) {
-                         const canvas = printRef.current;
-                         const imageUrl = canvas ? canvas.toDataURL?.('image/jpeg', 0.9) || '' : '';
+                     onClick={async () => {
+                       if (!onOpenPurchase || !thought || !printRef.current) return;
+                       setIsDownloading(true);
+                       try {
+                         // Render the design div to a real canvas with html2canvas
+                         const canvas = await html2canvas(printRef.current, {
+                           useCORS: true,
+                           scale: 3,           // high quality for print
+                           backgroundColor: null,
+                         });
+                         const imageUrl = canvas.toDataURL('image/jpeg', 0.92);
                          onOpenPurchase(thought, imageUrl);
                          onClose();
+                       } catch {
+                         // fallback: open shop without image (shows "design first" message)
+                         onOpenPurchase(thought, '');
+                         onClose();
+                       } finally {
+                         setIsDownloading(false);
                        }
                      }}
-                     className="w-full py-4 rounded-xl font-bold text-sm tracking-wide uppercase shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white"
+                     disabled={isDownloading}
+                     className="w-full py-4 rounded-full font-bold text-sm tracking-wide uppercase shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-white disabled:opacity-60"
+                     style={{ background: 'rgba(255,70,46,0.15)', border: '1px solid rgba(255,70,46,0.45)', fontFamily: "'Comfortaa', sans-serif" }}
                    >
-                     <ShoppingBag size={18} />
-                     Order This on a Product
+                     {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <ShoppingBag size={18} />}
+                     {isDownloading ? 'Preparing artwork…' : 'Order This on a Product'}
                    </button>
 
                    {/* Donation Button */}

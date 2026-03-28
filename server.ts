@@ -21,9 +21,7 @@ const PRODIGI_API_URL = "https://api.prodigi.com/v4.0";
 const PRODIGI_API_KEY = process.env.PRODIGI_API_KEY!;
 
 // --- Stripe ---
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-11-preview",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // --- Debug endpoint ---
 app.get("/api/debug", (req, res) => {
@@ -79,6 +77,55 @@ app.get("/api/products/:sku", async (req, res) => {
   } catch (error: any) {
     console.error("Prodigi Product Detail Error:", error.response?.data || error.message);
     res.status(500).json({ error: "Failed to fetch product details" });
+  }
+});
+
+// --- Image Upload: base64 → public URL via Cloudinary (unsigned) ---
+// POST /api/upload-image
+// Body: { imageBase64: string }  (full data URI or raw base64)
+//
+// Setup (free, no credit card — https://cloudinary.com):
+//   1. Register at cloudinary.com → free tier (25 GB storage/bandwidth)
+//   2. Copy your Cloud Name from the Dashboard
+//   3. Settings → Upload → Upload Presets → Add upload preset → Unsigned
+//   4. Add to .env:
+//        CLOUDINARY_CLOUD_NAME=your_cloud_name
+//        CLOUDINARY_UPLOAD_PRESET=your_preset_name
+//
+app.post("/api/upload-image", async (req, res) => {
+  const { imageBase64 } = req.body;
+  if (!imageBase64) {
+    return res.status(400).json({ error: "imageBase64 is required" });
+  }
+
+  const CLOUD_NAME   = process.env.CLOUDINARY_CLOUD_NAME;
+  const UPLOAD_PRESET = process.env.CLOUDINARY_UPLOAD_PRESET;
+
+  if (!CLOUD_NAME || !UPLOAD_PRESET) {
+    return res.status(500).json({
+      error: "CLOUDINARY_CLOUD_NAME or CLOUDINARY_UPLOAD_PRESET not set in .env",
+    });
+  }
+
+  try {
+    const params = new URLSearchParams({
+      file:           imageBase64,          // Cloudinary accepts full data URIs
+      upload_preset:  UPLOAD_PRESET,
+      folder:         "mindgallery",        // organises uploads in your Cloudinary dashboard
+    });
+
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+      params.toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    // Return the secure HTTPS URL Cloudinary assigned
+    res.json({ url: response.data.secure_url });
+  } catch (error: any) {
+    const detail = error.response?.data?.error?.message || error.response?.data || error.message;
+    console.error("Cloudinary Upload Error:", detail);
+    res.status(500).json({ error: `Cloudinary: ${detail}` });
   }
 });
 
@@ -202,7 +249,7 @@ app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), asyn
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const { sku, countryCode, imageUrl } = session.metadata!;
-    const shipping = session.shipping_details;
+    const shipping = (session as any).shipping_details ?? (session as any).shipping;
     const customer = session.customer_details;
 
     try {

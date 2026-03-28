@@ -86,10 +86,10 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
       ></div>
       
       {/* Matting & Canvas */}
-      <div 
+      <div
         onClick={onClick}
-        className={`relative w-full h-full flex flex-col justify-center p-8 z-10 overflow-hidden shadow-inner-matte cursor-pointer ${getAlignClass(styleConfig.align)} 
-          ${isNegativeMode ? 'bg-zinc-900 text-gray-200' : 'bg-white text-slate-900'}`}
+        className={`relative w-full h-full flex flex-col justify-center p-8 z-10 overflow-hidden shadow-inner-matte cursor-pointer ${getAlignClass(styleConfig.align)}`}
+        style={{ background: isNegativeMode ? '#111111' : '#f5f4f3', color: isNegativeMode ? '#f9f9f9' : '#090909' }}
       >
         
         {/* Subtle Paper Texture */}
@@ -122,7 +122,7 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
           </h3>
 
           {!isNegativeMode && thought.author && (
-            <p className={`text-[10px] uppercase tracking-widest text-slate-400 font-sans mt-2`}>
+            <p className="text-[10px] uppercase tracking-widest mt-2" style={{ color: '#7f7f80', fontFamily: "'Comfortaa', sans-serif", letterSpacing: '0.15em' }}>
                — {thought.author}
             </p>
           )}
@@ -131,36 +131,34 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
         {/* Hover Actions / Interactions */}
         <div className="absolute bottom-4 right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 items-center">
            {onSearch && (
-             <button 
+             <button
                onClick={(e) => { e.stopPropagation(); onSearch(thought.category); }}
-               className={`p-1.5 rounded-full transition-all border ${
-                 isNegativeMode 
-                   ? 'bg-zinc-800 border-zinc-700 text-gray-400 hover:text-white'
-                   : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-blue-500'
-               }`}
+               className="p-1.5 rounded-full transition-all"
+               style={{ background: 'rgba(9,9,9,0.5)', border: '1px solid rgba(234,234,234,0.15)', color: '#7f7f80', backdropFilter: 'blur(8px)' }}
                title="Find similar thoughts"
              >
                <Search size={14} />
              </button>
            )}
-            {!isNegativeMode && onPurchase && (
-              <button 
+            {onPurchase && (
+              <button
                 onClick={(e) => { e.stopPropagation(); onPurchase(thought); }}
-                className={`p-1.5 rounded-full transition-all border bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500`}
+                className="p-1.5 rounded-full transition-all"
+                style={{ background: 'rgba(255,70,46,0.15)', border: '1px solid rgba(255,70,46,0.35)', color: '#ff462e', backdropFilter: 'blur(8px)' }}
                 title="Buy physical print"
               >
                 <ShoppingCart size={14} />
               </button>
             )}
-           <button 
+           <button
              onClick={(e) => { e.stopPropagation(); onLike(thought.id); }}
-             className={`flex items-center gap-1 px-2 py-1 rounded-full transition-all border ${
-               liked 
-                ? 'bg-rose-50 border-rose-200 text-rose-500' 
-                : isNegativeMode 
-                  ? 'bg-zinc-800 border-zinc-700 text-gray-400 hover:text-white'
-                  : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500'
-             }`}
+             className="flex items-center gap-1 px-2 py-1 rounded-full transition-all"
+             style={{
+               background: liked ? 'rgba(255,70,46,0.15)' : 'rgba(9,9,9,0.5)',
+               border: liked ? '1px solid rgba(255,70,46,0.35)' : '1px solid rgba(234,234,234,0.15)',
+               color: liked ? '#ff462e' : '#7f7f80',
+               backdropFilter: 'blur(8px)',
+             }}
            >
              <Heart size={14} fill={liked ? "currentColor" : "none"} />
              <span className="text-[10px] font-bold">{currentLikes}</span>
