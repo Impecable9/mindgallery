@@ -302,6 +302,12 @@ app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), asyn
 // --- Groq Oracle Chat ---
 app.post("/api/chat", async (req, res) => {
   const { messages, language, thoughtContext } = req.body;
+  const apiKey = process.env.GROQ_API_KEY;
+
+  if (!apiKey) {
+    console.error("❌ Groq API Key is missing from environment variables.");
+    return res.status(500).json({ error: "The Oracle is missing its divine key (API Key not set)." });
+  }
 
   try {
     const response = await axios.post(
@@ -329,7 +335,7 @@ app.post("/api/chat", async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
       }
@@ -338,8 +344,15 @@ app.post("/api/chat", async (req, res) => {
     const fullText = response.data.choices[0].message.content;
     res.json({ text: fullText });
   } catch (error: any) {
-    console.error("Groq Chat Error:", error.response?.data || error.message);
-    res.status(500).json({ error: "The Oracle is momentarily disconnected." });
+    const errorDetail = error.response?.data || error.message;
+    console.error("Groq Chat Error:", errorDetail);
+    
+    // Check if it's an authentication error
+    if (error.response?.status === 401) {
+      return res.status(500).json({ error: "The Oracle is unauthorized. Please check the API key." });
+    }
+    
+    res.status(500).json({ error: "The Oracle is momentarily disconnected. Please try again in a moment." });
   }
 });
 

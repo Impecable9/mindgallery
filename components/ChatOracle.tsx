@@ -59,8 +59,9 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
         })
       });
 
-      if (!res.ok) throw new Error("Chat API failed");
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "The Oracle is momentarily silent.");
+      
       const fullText = data.text || "The Oracle is silent for now...";
       
       // Parse recommendation
@@ -73,9 +74,9 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
         text: cleanText,
         recommendedThoughtId: recommendedId
       }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat failed", error);
-      setMessages(prev => [...prev, { role: 'model', text: "The connection to the Oracle was interrupted." }]);
+      setMessages(prev => [...prev, { role: 'model', text: error.message || "The connection to the Oracle was interrupted." }]);
     } finally {
       setIsLoading(false);
     }
