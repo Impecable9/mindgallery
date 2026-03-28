@@ -115,10 +115,14 @@ const App: React.FC = () => {
 
       {/* Ambient glow blobs — always dark */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[15%] right-[10%] w-[40%] h-[40%] rounded-full blur-[180px]"
-             style={{ background: isNegativeMode ? 'rgba(255,70,46,0.04)' : 'rgba(255,70,46,0.06)' }} />
-        <div className="absolute bottom-[10%] left-[5%] w-[30%] h-[30%] rounded-full blur-[140px]"
-             style={{ background: 'rgba(255,70,46,0.03)' }} />
+        <div className="absolute top-[10%] right-[5%] w-[45%] h-[45%] rounded-full blur-[180px] animate-pulse"
+             style={{ background: 'rgba(255,70,46,0.08)' }} />
+        <div className="absolute top-[40%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[150px]"
+             style={{ background: 'rgba(56,189,248,0.06)' }} />
+        <div className="absolute bottom-[20%] right-[10%] w-[35%] h-[35%] rounded-full blur-[160px]"
+             style={{ background: 'rgba(168,85,247,0.06)' }} />
+        <div className="absolute bottom-[5%] left-[15%] w-[25%] h-[25%] rounded-full blur-[120px]"
+             style={{ background: 'rgba(255,70,46,0.05)' }} />
         <ParticleBackground isNegativeMode={isNegativeMode} />
       </div>
 

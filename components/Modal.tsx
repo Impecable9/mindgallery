@@ -455,7 +455,7 @@ const Modal: React.FC<ModalProps> = ({
                 <button onClick={() => setViewMode('office')} title="Office" className={`p-2 rounded-full transition-colors ${viewMode === 'office' ? 'bg-white text-black' : 'text-slate-300 hover:text-white hover:bg-white/10'}`}><Briefcase size={16} /></button>
             </div>
           </div>          {/* Controls Editor Section */}
-          <div className="w-full md:w-[480px] bg-[#050505]/40 backdrop-blur-[50px] border-l border-white/[0.08] flex flex-col h-full z-10 shadow-[-50px_0_100px_rgba(0,0,0,0.5)]">
+          <div className="w-full md:w-[480px] flex flex-col h-full z-10 glass-premium glass-noise shadow-[-50px_0_100px_rgba(0,0,0,0.8)] border-l border-white/20">
             
             <div className="p-6 md:p-8 border-b border-white/[0.08] flex justify-between items-center bg-transparent z-20">
                <div>

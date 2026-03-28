@@ -95,12 +95,10 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
 
       <div 
         ref={scrollRef}
-        className={`flex-1 overflow-y-auto p-4 md:p-10 rounded-[2.5rem] border mb-8 space-y-6 no-scrollbar backdrop-blur-[40px] transition-all duration-700 shadow-[0_50px_100px_rgba(0,0,0,0.4)] relative overflow-hidden ${
-          isNegativeMode ? 'bg-white/[0.03] border-white/[0.08]' : 'bg-white/40 border-white/60'
-        }`}
+        className={`flex-1 overflow-y-auto p-4 md:p-10 rounded-[4rem] mb-8 space-y-6 no-scrollbar transition-all duration-700 glass-premium glass-noise glass-card-shine border-white/20 shadow-[0_50px_100px_rgba(0,0,0,0.6)] relative overflow-hidden`}
       >
         {/* Decorative background refraction */}
-        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#ff462e]/5 rounded-full blur-[100px] -z-10" />
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#ff462e]/10 rounded-full blur-[100px] -z-10 animate-pulse" />
         
         <AnimatePresence initial={false}>
           {messages.map((m, i) => (
@@ -111,10 +109,10 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[85%] p-5 md:p-8 rounded-[2rem] flex flex-col gap-4 shadow-2xl backdrop-blur-[30px] border transition-all hover:translate-y-[-2px] ${
+              <div className={`max-w-[85%] p-6 md:p-10 rounded-[2.5rem] flex flex-col gap-4 shadow-2xl transition-all hover:translate-y-[-2px] border ${
                 m.role === 'user'
-                  ? 'bg-gradient-to-br from-[#ff462e] to-[#c4321e] text-white border-white/20'
-                  : isNegativeMode ? 'bg-white/[0.05] text-gray-200 border-white/[0.05]' : 'bg-white/90 text-slate-800 border-white/60'
+                  ? 'bg-gradient-to-br from-[#ff462e] to-[#c4321e] text-white border-white/30'
+                  : 'glass-premium border-white/20 text-white'
               }`}>
                 <div className="flex gap-4">
                   <div className={`mt-1 p-2 rounded-xl ${m.role === 'user' ? 'bg-white/20' : 'bg-[#ff462e]/10'}`}>

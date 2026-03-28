@@ -125,9 +125,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className={`group p-4 md:p-6 rounded-[2rem] border flex items-start gap-5 backdrop-blur-[40px] transition-all duration-500 hover:translate-x-3 hover:shadow-[0_20px_50px_rgba(255,70,46,0.15)] ${
-                      isNegativeMode ? 'bg-white/5 border-white/[0.05] hover:bg-white/[0.08]' : 'bg-white/40 border-white/60'
-                    }`}
+                    className={`group p-4 md:p-8 rounded-[3rem] transition-all duration-700 hover:translate-x-3 glass-premium glass-noise shadow-[0_30px_60px_rgba(0,0,0,0.5)] border-white/20`}
                   >
                     <div className="p-4 bg-gradient-to-br from-[#ff462e]/20 to-[#ff462e]/5 rounded-2xl border border-[#ff462e]/20 shrink-0 group-hover:scale-110 transition-transform">
                       {tip.icon}
@@ -140,9 +138,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                 ))}
               </div>
 
-              <div className={`mt-8 md:mt-12 p-8 rounded-[2.5rem] relative overflow-hidden group transition-all duration-700 ${
-                  isNegativeMode ? 'bg-[#ff462e]/5 border border-[#ff462e]/10' : 'bg-white/40 border border-white/60'
-              }`}>
+              <div className={`mt-8 md:mt-12 p-10 rounded-[4rem] relative overflow-hidden group transition-all duration-1000 glass-premium glass-noise border-white/10`}>
                 {/* Refraction Effect Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 
