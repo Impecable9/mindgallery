@@ -43,7 +43,14 @@ const App: React.FC = () => {
   });
 
   const [isAbundanceOpen, setIsAbundanceOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const t = UI_TRANSLATIONS[language];
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Likes State (In-memory for demo)
   const [likes, setLikes] = useState<Record<string, number>>({});
@@ -288,60 +295,77 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* Design Toolbar */}
-      {viewMode === 'GALLERY' && (
-        <div className="fixed top-[68px] left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 px-5 py-2 rounded-full overflow-x-auto max-w-[90vw]"
-             style={{ background: 'rgba(17,17,17,0.8)', border: '1px solid rgba(234,234,234,0.08)', backdropFilter: 'blur(16px)' }}>
-          <div className="flex items-center gap-1.5 pr-4" style={{ borderRight: '1px solid rgba(234,234,234,0.1)' }}>
-            <Type size={12} style={{ color: '#7f7f80' }} />
-            {(['serif', 'sans', 'classic', 'hand'] as FontFamily[]).map(f => (
-              <button
-                key={f}
-                onClick={() => setGlobalStyle(s => ({...s, font: f}))}
-                className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold transition-all"
-                style={{
-                  background: globalStyle.font === f ? '#ff462e' : 'transparent',
-                  color: globalStyle.font === f ? '#fff' : '#7f7f80',
-                  fontFamily: "'Comfortaa', sans-serif",
-                }}
-              >Aa</button>
-            ))}
-          </div>
-          <div className="flex items-center gap-1.5 pr-4" style={{ borderRight: '1px solid rgba(234,234,234,0.1)' }}>
-            <Palette size={12} style={{ color: '#7f7f80' }} />
-            {(Object.keys(COLOR_MAP) as TextColor[]).map(c => (
-              <button
-                key={c}
-                onClick={() => setGlobalStyle(s => ({...s, color: c}))}
-                className="w-4 h-4 rounded-full transition-all"
-                style={{
-                  backgroundColor: c === 'black' ? '#f9f9f9' : c === 'slate' ? '#94a3b8' : c === 'rose' ? '#fb7185' : c === 'emerald' ? '#34d399' : c === 'violet' ? '#a78bfa' : '#fbbf24',
-                  outline: globalStyle.color === c ? '2px solid #ff462e' : 'none',
-                  outlineOffset: '2px',
-                  transform: globalStyle.color === c ? 'scale(1.2)' : 'scale(1)',
-                }}
+      {/* Design Toolbar - Appears on scroll */}
+      <AnimatePresence>
+        {viewMode === 'GALLERY' && scrollY > 500 && (
+          <motion.div 
+            initial={{ y: -20, opacity: 0, x: '-50%' }}
+            animate={{ y: 0, opacity: 1, x: '-50%' }}
+            exit={{ y: -20, opacity: 0, x: '-50%' }}
+            className="fixed top-[74px] left-1/2 z-40 flex items-center gap-4 px-6 py-2.5 rounded-full overflow-x-auto max-w-[95vw] glass-premium glass-noise shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-white/20"
+          >
+            <div className="flex items-center gap-1.5 pr-4 border-r border-white/10">
+              <Type size={12} className="text-white/40" />
+              {(['serif', 'sans', 'classic', 'hand'] as FontFamily[]).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setGlobalStyle(s => ({...s, font: f}))}
+                  className="w-7 h-7 rounded-xl flex items-center justify-center text-[10px] font-bold transition-all hover:scale-110 active:scale-95"
+                  style={{
+                    background: globalStyle.font === f ? '#ff462e' : 'rgba(255,255,255,0.05)',
+                    color: globalStyle.font === f ? '#fff' : 'rgba(255,255,255,0.4)',
+                    fontFamily: "'Comfortaa', sans-serif",
+                  }}
+                >Aa</button>
+              ))}
+            </div>
+            
+            <div className="flex items-center gap-1.5 pr-4 border-r border-white/10">
+              <Palette size={12} className="text-white/40" />
+              {(Object.keys(COLOR_MAP) as TextColor[]).map(c => (
+                <button
+                  key={c}
+                  onClick={() => setGlobalStyle(s => ({...s, color: c}))}
+                  className="w-5 h-5 rounded-full transition-all hover:scale-125 border border-white/10"
+                  style={{
+                    backgroundColor: c === 'black' ? '#f9f9f9' : c === 'slate' ? '#94a3b8' : c === 'rose' ? '#fb7185' : c === 'emerald' ? '#34d399' : c === 'violet' ? '#a78bfa' : '#fbbf24',
+                    outline: globalStyle.color === c ? '2px solid #ff462e' : 'none',
+                    outlineOffset: '2px',
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="flex items-center gap-1 pr-4 border-r border-white/10">
+               {[
+                 { id: 'left', icon: <AlignLeft size={13}/> },
+                 { id: 'center', icon: <AlignCenter size={13}/> },
+                 { id: 'right', icon: <AlignRight size={13}/> }
+               ].map(btn => (
+                <button 
+                  key={btn.id}
+                  onClick={() => setGlobalStyle(s => ({...s, align: btn.id as TextAlign}))}
+                  className="p-1.5 rounded-lg transition-all hover:bg-white/5"
+                  style={{ color: globalStyle.align === btn.id ? '#ff462e' : 'rgba(255,255,255,0.3)' }}
+                >
+                  {btn.icon}
+                </button>
+               ))}
+            </div>
+
+             <div className="hidden md:flex items-center gap-2">
+              <Search size={12} className="text-white/40" />
+              <input
+                type="text"
+                placeholder={t.lblSearchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent border-none text-[10px] text-white focus:outline-none w-20 md:w-32 placeholder:text-white/20 font-serif"
               />
-            ))}
-          </div>
-          <div className="flex items-center gap-1">
-            <button onClick={() => setGlobalStyle(s => ({...s, align: 'left'}))}
-              className="p-1 rounded transition-all"
-              style={{ color: globalStyle.align === 'left' ? '#ff462e' : '#7f7f80' }}>
-              <AlignLeft size={13}/>
-            </button>
-            <button onClick={() => setGlobalStyle(s => ({...s, align: 'center'}))}
-              className="p-1 rounded transition-all"
-              style={{ color: globalStyle.align === 'center' ? '#ff462e' : '#7f7f80' }}>
-              <AlignCenter size={13}/>
-            </button>
-            <button onClick={() => setGlobalStyle(s => ({...s, align: 'right'}))}
-              className="p-1 rounded transition-all"
-              style={{ color: globalStyle.align === 'right' ? '#ff462e' : '#7f7f80' }}>
-              <AlignRight size={13}/>
-            </button>
-          </div>
-        </div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
       <main className="pt-28 pb-20 px-4 md:px-10 z-10 relative max-w-[1600px] mx-auto">
