@@ -13,14 +13,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
+// Global configuration
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-
-// Global error handler to prevent plain text responses
-app.use((err: any, req: any, res: any, next: any) => {
-  console.error("🔥 GLOBAL_ERROR:", err.stack || err);
-  res.status(500).json({ error: "A server error occurred within the Oracle structure." });
-});
 
 // --- Prodigi API ---
 const PRODIGI_API_URL = "https://api.prodigi.com/v4.0";
@@ -326,6 +321,7 @@ app.post("/api/chat", async (req, res) => {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
+        timeout: 8000, 
       }
     );
 
@@ -335,12 +331,22 @@ app.post("/api/chat", async (req, res) => {
     const errorDetail = error.response?.data || error.message;
     console.error("Groq Chat Error:", errorDetail);
     
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+       return res.status(504).json({ error: "The Oracle is taking too long to manifest. Please try again." });
+    }
+
     if (error.response?.status === 401) {
       return res.status(500).json({ error: "The Oracle is unauthorized. Please check the API key." });
     }
     
-    res.status(500).json({ error: "The Oracle is momentarily disconnected. Please try again in a moment." });
+    res.status(500).json({ error: "The Oracle is momentarily disconnected. (" + (error.message || "Unknown error") + ")" });
   }
+});
+
+// Final Error Handler (Must be last)
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error("🔥 LATE_GLOBAL_ERROR:", err.stack || err);
+  res.status(500).json({ error: "The Oracle's sanctuary has been disturbed (Internal Server Error)." });
 });
 
 // --- Vite Dev / Static Serve ---
