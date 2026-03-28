@@ -291,6 +291,7 @@ app.post("/api/chat", async (req, res) => {
   try {
     const { messages, language, thoughtContext } = req.body;
     const apiKey = (process.env.GROQ_API_KEY || "").trim();
+    console.log("🔍 Oracle API Key check - Length:", apiKey.length);
 
     if (!apiKey) {
       console.error("❌ Groq API Key is missing.");
@@ -300,7 +301,7 @@ app.post("/api/chat", async (req, res) => {
     const response = await axios.post(
       "https://api.groq.com/openai/v1/chat/completions",
       {
-        model: "llama-3.3-70b-versatile",
+        model: "mixtral-8x7b-32768",
         messages: [
           {
             role: "system",

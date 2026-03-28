@@ -120,27 +120,33 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className={`p-4 md:p-6 rounded-3xl border flex items-start gap-4 backdrop-blur-xl transition-all hover:translate-x-2 ${
-                      isNegativeMode ? 'bg-[#111111]/40 border-white/5' : 'bg-white/40 border-slate-100'
+                    className={`group p-4 md:p-6 rounded-[2rem] border flex items-start gap-5 backdrop-blur-[40px] transition-all duration-500 hover:translate-x-3 hover:shadow-[0_20px_50px_rgba(255,70,46,0.15)] ${
+                      isNegativeMode ? 'bg-white/5 border-white/[0.05] hover:bg-white/[0.08]' : 'bg-white/40 border-white/60'
                     }`}
                   >
-                    <div className="p-3 bg-white/5 rounded-2xl border border-white/10 shrink-0">
+                    <div className="p-4 bg-gradient-to-br from-[#ff462e]/20 to-[#ff462e]/5 rounded-2xl border border-[#ff462e]/20 shrink-0 group-hover:scale-110 transition-transform">
                       {tip.icon}
                     </div>
                     <div>
-                      <h4 className="text-white font-bold mb-1 text-sm md:text-base">{tip.title}</h4>
-                      <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{tip.desc}</p>
+                      <h4 className="text-white font-serif font-bold mb-1 text-base md:text-lg tracking-tight group-hover:text-[#ff462e] transition-colors">{tip.title}</h4>
+                      <p className="text-slate-400 text-xs md:text-sm leading-relaxed opacity-80">{tip.desc}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              <div className={`mt-6 md:mt-10 p-4 md:p-6 rounded-[2rem] border-l-4 border-[#ff462e] ${isNegativeMode ? 'bg-black/40 border-white/10' : 'bg-white/40 border-slate-100'}`}>
-                <p className="text-slate-300 italic text-xs md:text-sm leading-relaxed">
+              <div className={`mt-8 md:mt-12 p-8 rounded-[2.5rem] relative overflow-hidden group transition-all duration-700 ${
+                  isNegativeMode ? 'bg-[#ff462e]/5 border border-[#ff462e]/10' : 'bg-white/40 border border-white/60'
+              }`}>
+                {/* Refraction Effect Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                
+                <p className="text-slate-200 italic text-sm md:text-base leading-relaxed relative z-10 font-serif">
                   {language === 'es' 
                     ? '"La palabra tiene poder creativo. El pensamiento de abundancia es la instrucción que le das a tu campo de energía."'
                     : '"Words hold creative power. An abundance thought is the instruction you give to your energy field."'}
                 </p>
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ff462e]" />
               </div>
             </motion.div>
           </div>
