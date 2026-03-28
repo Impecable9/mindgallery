@@ -59,8 +59,17 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
         })
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "The Oracle is momentarily silent.");
+      let data;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error("Non-JSON error from Oracle:", text);
+        throw new Error("The Oracle is momentarily silent (Server Error).");
+      }
+
+      if (!res.ok) throw new Error(data.error || "The Oracle is momentarily disconnected.");
       
       const fullText = data.text || "The Oracle is silent for now...";
       
