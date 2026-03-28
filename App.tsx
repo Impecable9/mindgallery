@@ -7,6 +7,7 @@ import ThoughtCard from './components/ThoughtCard';
 import Modal from './components/Modal';
 import ConceptGuide from './components/ConceptGuide';
 import HeroSection from './components/HeroSection';
+import AbundanceCreator from './components/AbundanceCreator';
 import RouletteGame from './components/RouletteGame';
 import ChatOracle from './components/ChatOracle';
 import AddThoughtModal from './components/AddThoughtModal';
@@ -345,6 +346,29 @@ const App: React.FC = () => {
                 const pool = THOUGHTS_DATA.filter(t => !t.isPremium);
                 const pick = pool[Math.floor(Math.random() * pool.length)] || THOUGHTS_DATA[0];
                 setSelectedThought(pick);
+              }}
+            />
+
+            <AbundanceCreator 
+              isNegativeMode={isNegativeMode} 
+              language={language}
+              onSave={(thoughtContent) => {
+                // For now, it opens the editor with this custom content
+                // We fake a thought object
+                const customThought: Thought = {
+                  id: 'custom-' + Date.now(),
+                  category: CategoryType.ABUNDANCE,
+                  content: {
+                    en: { limiting: '...', expansive: thoughtContent.expansive },
+                    es: { limiting: '...', expansive: thoughtContent.expansive },
+                    de: { limiting: '...', expansive: thoughtContent.expansive }
+                  },
+                  author: language === 'es' ? 'Tú (Arquitecto de Realidad)' : 'You (Reality Architect)',
+                  likes: 0,
+                  isPremium: false,
+                  visualDescription: "Custom manifestation art"
+                };
+                setSelectedThought(customThought);
               }}
             />
 
