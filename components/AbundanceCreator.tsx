@@ -10,23 +10,29 @@ interface AbundanceCreatorProps {
 }
 
 const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, language, onSave }) => {
-  const [text, setText] = useState('Estoy feliz y agradecido ahora que...');
+  const getInitialText = () => {
+    if (language === 'es') return 'Estoy feliz y agradecido ahora que...';
+    if (language === 'de') return 'Ich bin jetzt glücklich und dankbar, dass...';
+    return 'I am happy and grateful now that...';
+  };
+
+  const [text, setText] = useState(getInitialText());
   const [isHovered, setIsHovered] = useState(false);
 
   const tips = [
     {
-      title: language === 'es' ? 'Habla en Presente' : 'Speak in Present',
-      desc: language === 'es' ? 'Escribe como si ya estuviera sucediendo. No digas "seré", di "soy" o "tengo".' : 'Write as if it is already happening. Use "I am" or "I have" instead of "I will".',
+      title: language === 'es' ? 'Habla en Presente' : language === 'de' ? 'Sprich im Präsens' : 'Speak in Present',
+      desc: language === 'es' ? 'Escribe como si ya estuviera sucediendo. No digas "seré", di "soy" o "tengo".' : language === 'de' ? 'Schreibe so, als ob es bereits geschieht. Sage "ich bin" oder "ich habe".' : 'Write as if it is already happening. Use "I am" or "I have" instead of "I will".',
       icon: <Zap size={18} className="text-[#ff462e]" />
     },
     {
-      title: language === 'es' ? 'Enfoque Positivo' : 'Positive Focus',
-      desc: language === 'es' ? 'Evita palabras negativas. Di "Tengo una salud vibrante" en lugar de "No estoy enfermo".' : 'Avoid negative words. "I have vibrant health" instead of "I am not sick".',
+      title: language === 'es' ? 'Enfoque Positivo' : language === 'de' ? 'Positiver Fokus' : 'Positive Focus',
+      desc: language === 'es' ? 'Evita palabras negativas. Di "Tengo una salud vibrante" en lugar de "No estoy enfermo".' : language === 'de' ? 'Vermeide negative Wörter. Sage "Ich bin kerngesund" anstatt "Ich bin nicht krank".' : 'Avoid negative words. "I have vibrant health" instead of "I am not sick".',
       icon: <Heart size={18} className="text-[#ff462e]" />
     },
     {
-      title: language === 'es' ? 'Siente la Gratitud' : 'Feel the Gratitude',
-      desc: language === 'es' ? 'Empieza con agradecimiento. La gratitud abre la puerta a la abundancia.' : 'Start with thanks. Gratitude opens the door to abundance.',
+      title: language === 'es' ? 'Siente la Gratitud' : language === 'de' ? 'Spüre die Dankbarkeit' : 'Feel the Gratitude',
+      desc: language === 'es' ? 'Empieza con agradecimiento. La gratitud abre la puerta a la abundancia.' : language === 'de' ? 'Beginne mit Dankbarkeit. Dankbarkeit öffnet die Tür zum Überfluss.' : 'Start with thanks. Gratitude opens the door to abundance.',
       icon: <Sparkles size={18} className="text-[#ff462e]" />
     }
   ];
@@ -65,13 +71,13 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                 <div className="p-3 bg-[#ff462e]/10 rounded-2xl border border-[#ff462e]/20">
                   <Sparkles className="text-[#ff462e]" size={28} />
                 </div>
-                {language === 'es' ? 'Ancla tu Abundancia' : 'Anchor Your Abundance'}
+                {language === 'es' ? 'Ancla tu Abundancia' : language === 'de' ? 'Verankere deinen Überfluss' : 'Anchor Your Abundance'}
               </h2>
 
               <div className="space-y-8 relative z-10">
                 <div>
                   <label className={`block text-[11px] uppercase tracking-[6px] font-bold mb-5 ${isNegativeMode ? 'text-white/30' : 'text-slate-400'}`}>
-                    {language === 'es' ? 'Escribe tu nueva realidad' : 'Write your new reality'}
+                    {language === 'es' ? 'Escribe tu nueva realidad' : language === 'de' ? 'Schreibe deine neue Realität' : 'Write your new reality'}
                   </label>
                   <textarea
                     value={text}
@@ -93,7 +99,7 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                     animate={{ x: isHovered ? 8 : 0 }}
                     className="flex items-center gap-5"
                   >
-                    {language === 'es' ? 'Manifestar Ahora' : 'Manifest Now'}
+                    {language === 'es' ? 'Manifestar Ahora' : language === 'de' ? 'Jetzt manifestieren' : 'Manifest Now'}
                     <ArrowRight size={24} />
                   </motion.div>
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500" />
@@ -111,10 +117,10 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ff462e]/10 border border-[#ff462e]/20 text-[#ff462e] text-[10px] font-bold uppercase tracking-widest mb-6">
                 <Info size={14} />
-                Guía de Manifestación
+                {language === 'es' ? 'Guía de Manifestación' : language === 'de' ? 'Manifestations-Leitfaden' : 'Manifestation Guide'}
               </div>
               <h3 className="text-2xl md:text-4xl font-serif font-bold text-white mb-6 leading-tight">
-                {language === 'es' ? 'Cómo diseñar un pensamiento de poder' : 'How to design a power thought'}
+                {language === 'es' ? 'Cómo diseñar un pensamiento de poder' : language === 'de' ? 'Wie man einen Gedanken der Kraft gestaltet' : 'How to design a power thought'}
               </h3>
               
               <div className="grid gap-4 md:gap-6">
@@ -145,6 +151,8 @@ const AbundanceCreator: React.FC<AbundanceCreatorProps> = ({ isNegativeMode, lan
                 <p className="text-slate-200 italic text-sm md:text-base leading-relaxed relative z-10 font-serif">
                   {language === 'es' 
                     ? '"La palabra tiene poder creativo. El pensamiento de abundancia es la instrucción que le das a tu campo de energía."'
+                    : language === 'de'
+                    ? '"Worte haben schöpferische Kraft. Ein Gedanke des Überflusses ist die Anweisung, die du deinem Energiefeld gibst."'
                     : '"Words hold creative power. An abundance thought is the instruction you give to your energy field."'}
                 </p>
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ff462e]" />
