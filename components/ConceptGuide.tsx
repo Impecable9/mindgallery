@@ -4,12 +4,12 @@ import { Moon, Sun, RefreshCw, Zap } from 'lucide-react';
 const ConceptGuide: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto py-12 px-6 text-slate-300">
-      <h1 className="text-4xl font-serif text-white mb-8 border-b border-slate-700 pb-4">MindGallery Concept Guide</h1>
+      <h1 className="text-4xl font-serif text-white mb-8 border-b border-[rgba(255,255,255,0.08)] pb-4">MindGallery Concept Guide</h1>
       
       {/* NEW SECTION: How to use Polarity */}
-      <section className="mb-12 bg-slate-800/40 p-8 rounded-2xl border border-slate-700">
+      <section className="mb-12 bg-[#090909]/60 backdrop-blur-2xl p-8 rounded-2xl border border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
         <h2 className="text-2xl font-serif text-white mb-6 flex items-center gap-3">
-          <Zap className="text-yellow-400" />
+          <Zap className="text-[#ff462e]" />
           The Polarity Framework: How to Use
         </h2>
         <div className="space-y-6">
@@ -18,8 +18,8 @@ const ConceptGuide: React.FC = () => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-700/50 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <div className="bg-[#111111]/80 backdrop-blur-md p-6 rounded-xl border border-[rgba(255,255,255,0.05)] relative overflow-hidden group shadow-lg">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Moon size={100} />
               </div>
               <div className="flex items-center gap-3 mb-3 relative z-10">
@@ -39,8 +39,8 @@ const ConceptGuide: React.FC = () => {
               <div className="mt-4 text-xs uppercase tracking-widest text-indigo-400 font-bold relative z-10">Step 1: Acknowledge it exists.</div>
             </div>
 
-            <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-700/50 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <div className="bg-[#111111]/80 backdrop-blur-md p-6 rounded-xl border border-[rgba(255,255,255,0.05)] relative overflow-hidden group shadow-lg">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Sun size={100} />
               </div>
               <div className="flex items-center gap-3 mb-3 relative z-10">
@@ -61,9 +61,10 @@ const ConceptGuide: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-6 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl border-l-4 border-green-500 shadow-lg">
-             <div className="flex items-start gap-4">
-               <RefreshCw className="shrink-0 mt-1 text-green-400" size={24} />
+          <div className="p-6 bg-gradient-to-r from-[#090909] to-[#111111] rounded-xl border-l-[3px] border-[#ff462e] shadow-2xl relative overflow-hidden">
+             <div className="absolute inset-0 bg-[radial-gradient(circle_at_right,rgba(255,70,46,0.05)_0%,transparent_60%)] pointer-events-none" />
+             <div className="flex items-start gap-4 relative z-10">
+               <RefreshCw className="shrink-0 mt-1 text-[#ff462e]" size={24} />
                <div>
                  <h4 className="font-bold text-white text-lg mb-2">3. Lock it in (The Anchor)</h4>
                  <p className="text-slate-300 mb-4">

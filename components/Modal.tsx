@@ -363,7 +363,7 @@ const Modal: React.FC<ModalProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-[#090909] w-full max-w-7xl h-[90vh] rounded-3xl overflow-hidden border border-[rgba(234,234,234,0.08)] shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex flex-col md:flex-row relative group/modal"
+          className="bg-[#090909]/60 backdrop-blur-3xl w-full max-w-7xl h-[90vh] rounded-3xl overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-[0_30px_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row relative group/modal"
         >
           <GlowingEffect spread={60} glow={false} disabled={false} proximity={120} inactiveZone={0.01} borderWidth={2} />
           
@@ -457,9 +457,9 @@ const Modal: React.FC<ModalProps> = ({
           </div>
 
           {/* Controls Editor Section */}
-          <div className="w-full md:w-[450px] bg-[#090909] border-l border-[rgba(234,234,234,0.08)] flex flex-col h-full z-10">
+          <div className="w-full md:w-[450px] bg-[#090909]/40 backdrop-blur-2xl border-l border-[rgba(255,255,255,0.08)] flex flex-col h-full z-10 shadow-lg">
             
-            <div className="p-5 border-b border-[rgba(234,234,234,0.08)] flex justify-between items-center bg-[#090909] z-20">
+            <div className="p-5 border-b border-[rgba(255,255,255,0.08)] flex justify-between items-center bg-transparent z-20">
                <div>
                   <h3 className="text-[#ff462e] text-[10px] font-bold uppercase tracking-[2px] mb-1">{t.modalCustomize}</h3>
                   <h1 className="text-xl font-serif text-[#f9f9f9] tracking-tight">{t.modalTitle}</h1>
@@ -739,7 +739,7 @@ const Modal: React.FC<ModalProps> = ({
 
             </div>
 
-            <div className="p-5 border-t border-[rgba(255,255,255,0.08)] bg-[#090909] space-y-3">
+            <div className="p-5 border-t border-[rgba(255,255,255,0.08)] bg-transparent space-y-3">
               {/* DOWNLOAD FORMAT SELECTION */}
               <div className="flex items-center justify-between">
                 <span className="text-[10px] uppercase font-bold text-slate-500 tracking-[2px]">{t.lblFormat}</span>

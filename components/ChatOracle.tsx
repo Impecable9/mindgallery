@@ -94,8 +94,8 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
 
       <div 
         ref={scrollRef}
-        className={`flex-1 overflow-y-auto p-6 rounded-3xl border mb-6 space-y-4 no-scrollbar ${
-          isNegativeMode ? 'bg-black/40 border-white/10' : 'bg-white/40 border-white/40 shadow-inner'
+        className={`flex-1 overflow-y-auto p-6 rounded-3xl border mb-6 space-y-4 no-scrollbar backdrop-blur-2xl transition-all duration-500 shadow-xl ${
+          isNegativeMode ? 'bg-[#090909]/60 border-[rgba(255,255,255,0.08)] shadow-black/50' : 'bg-white/40 border-white/60 shadow-black/5'
         }`}
       >
         <AnimatePresence initial={false}>
@@ -106,14 +106,14 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[80%] p-4 rounded-2xl flex flex-col gap-3 ${
+              <div className={`max-w-[80%] p-4 rounded-2xl flex flex-col gap-3 shadow-lg backdrop-blur-xl border transition-colors ${
                 m.role === 'user'
-                  ? isNegativeMode ? 'bg-purple-600 text-white' : 'bg-slate-900 text-white'
-                  : isNegativeMode ? 'bg-white/10 text-gray-200' : 'bg-white text-slate-800 shadow-md'
+                  ? isNegativeMode ? 'bg-[#ff462e]/90 text-white border-[#ff462e]/50' : 'bg-[#ff462e]/90 text-white border-[#ff462e]/50'
+                  : isNegativeMode ? 'bg-[#111111]/80 text-gray-200 border-[rgba(255,255,255,0.05)]' : 'bg-white/80 text-slate-800 border-white/60'
               }`}>
                 <div className="flex gap-3">
                   <div className="mt-1">
-                    {m.role === 'user' ? <User size={16} /> : <Bot size={16} className="text-rose-500" />}
+                    {m.role === 'user' ? <User size={16} /> : <Bot size={16} className={isNegativeMode ? "text-[#ff462e]" : "text-[#ca331f]"} />}
                   </div>
                   <p className="text-sm leading-relaxed">{m.text}</p>
                 </div>
@@ -138,8 +138,8 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
         </AnimatePresence>
         {isLoading && (
           <div className="flex justify-start">
-            <div className={`p-4 rounded-2xl flex gap-3 ${isNegativeMode ? 'bg-white/5' : 'bg-white'}`}>
-              <Loader2 size={16} className="animate-spin text-rose-500" />
+              <div className={`p-4 rounded-2xl flex gap-3 backdrop-blur-xl border ${isNegativeMode ? 'bg-[#111111]/80 border-[rgba(255,255,255,0.05)]' : 'bg-white/80 border-white/60'}`}>
+              <Loader2 size={16} className={`animate-spin ${isNegativeMode ? 'text-[#ff462e]' : 'text-[#ca331f]'}`} />
             </div>
           </div>
         )}
@@ -152,19 +152,19 @@ const ChatOracle: React.FC<ChatOracleProps> = ({ language, isNegativeMode, thoug
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder={t.lblChatPlaceholder}
-          className={`w-full pl-6 pr-14 py-4 rounded-2xl border focus:ring-2 focus:outline-none transition-all ${
+          className={`w-full pl-6 pr-14 py-4 rounded-2xl border focus:ring-2 focus:outline-none transition-all shadow-xl backdrop-blur-md ${
             isNegativeMode 
-              ? 'bg-white/5 border-white/10 text-white focus:ring-purple-500/30' 
-              : 'bg-white border-white/40 text-slate-800 focus:ring-rose-500/30 shadow-lg'
+              ? 'bg-[#090909]/60 border-[rgba(255,255,255,0.08)] text-white focus:ring-[rgba(255,70,46,0.3)]' 
+              : 'bg-white/60 border-white/60 text-slate-800 focus:ring-[rgba(255,70,46,0.3)]'
           }`}
         />
         <button
           onClick={handleSend}
           disabled={isLoading}
-          className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all ${
+          className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all shadow-md ${
             isNegativeMode 
-              ? 'bg-purple-600 text-white hover:bg-purple-500' 
-              : 'bg-slate-900 text-white hover:bg-slate-800'
+              ? 'bg-[#ff462e] text-white hover:bg-[#c4321e] hover:shadow-[0_0_15px_rgba(255,70,46,0.5)]' 
+              : 'bg-[#ff462e] text-white hover:bg-[#c4321e] hover:shadow-[0_0_15px_rgba(255,70,46,0.4)]'
           }`}
         >
           <Send size={18} />
