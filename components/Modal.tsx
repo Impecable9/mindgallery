@@ -6,6 +6,7 @@ import { jsPDF } from 'jspdf';
 import { AspectRatio, Thought, StyleConfig, FontFamily, TextAlign, TextColor, FrameColor, LogoStyle, ArtStyle, Language } from '../types';
 import { X, Download, Palette, Maximize2, Type, Check, Sparkles, Image as ImageIcon, Frame, Stamp, Loader2, CircleOff, Pencil, Armchair, BedDouble, Briefcase, ZoomIn, Globe, Eye, EyeOff, User, UserMinus, FileImage, FileText, Sun, Moon, BookOpen, Zap, MoveRight, ArrowDown, Smartphone, Layers, ShoppingBag } from 'lucide-react';
 import { COLOR_MAP, FRAME_STYLES, LOGO_COMPONENTS, ART_STYLES_CSS, AI_PROMPTS, UI_TRANSLATIONS } from '../constants';
+import { GlowingEffect } from './GlowingEffect';
 
 interface ModalProps {
   thought: Thought | null;
@@ -21,7 +22,7 @@ interface ModalProps {
 
 // Mockup backgrounds
 const MOCKUPS = {
-  studio: { label: 'Studio', img: '', css: 'bg-[#e2e8f0]' },
+  studio: { label: 'Studio', img: '', css: 'bg-[#090909]' },
   living: { label: 'Living Room', img: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?q=80&w=2070&auto=format&fit=crop', css: 'bg-cover bg-center' },
   bedroom: { label: 'Bedroom', img: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2069&auto=format&fit=crop', css: 'bg-cover bg-center' },
   office: { label: 'Office', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop', css: 'bg-cover bg-center' },
@@ -362,17 +363,19 @@ const Modal: React.FC<ModalProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-[#1e293b] w-full max-w-7xl h-[90vh] rounded-3xl overflow-hidden border border-slate-700 shadow-2xl flex flex-col md:flex-row"
+          className="bg-[#090909] w-full max-w-7xl h-[90vh] rounded-3xl overflow-hidden border border-[rgba(234,234,234,0.08)] shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex flex-col md:flex-row relative group/modal"
         >
+          <GlowingEffect spread={60} glow={false} disabled={false} proximity={120} inactiveZone={0.01} borderWidth={2} />
+          
           {/* Preview Section */}
           <div 
-            className={`flex-1 relative overflow-hidden group transition-all duration-500 ${viewMode === 'studio' ? MOCKUPS.studio.css : 'bg-cover bg-center bg-no-repeat'}`}
+            className={`flex-1 relative overflow-hidden group transition-all duration-500 z-10 ${viewMode === 'studio' ? MOCKUPS.studio.css : 'bg-cover bg-center bg-no-repeat'}`}
             style={viewMode !== 'studio' ? { backgroundImage: `url(${MOCKUPS[viewMode].img})` } : undefined}
           >
              {viewMode === 'studio' && (
                <>
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-multiply" />
-                <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-slate-300/50 pointer-events-none" />
+                <div className="absolute inset-0 bg-[#090909]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,70,46,0.08)_0%,transparent_60%)] pointer-events-none" />
                </>
              )}
             
@@ -454,12 +457,12 @@ const Modal: React.FC<ModalProps> = ({
           </div>
 
           {/* Controls Editor Section */}
-          <div className="w-full md:w-[450px] bg-[#0f172a] border-l border-slate-800 flex flex-col h-full">
+          <div className="w-full md:w-[450px] bg-[#090909] border-l border-[rgba(234,234,234,0.08)] flex flex-col h-full z-10">
             
-            <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-[#0f172a] z-20">
+            <div className="p-5 border-b border-[rgba(234,234,234,0.08)] flex justify-between items-center bg-[#090909] z-20">
                <div>
-                  <h3 className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">{t.modalCustomize}</h3>
-                  <h1 className="text-xl font-serif text-white">{t.modalTitle}</h1>
+                  <h3 className="text-[#ff462e] text-[10px] font-bold uppercase tracking-[2px] mb-1">{t.modalCustomize}</h3>
+                  <h1 className="text-xl font-serif text-[#f9f9f9] tracking-tight">{t.modalTitle}</h1>
                </div>
                <div className="flex items-center gap-2">
                  <button 
@@ -480,14 +483,14 @@ const Modal: React.FC<ModalProps> = ({
               
               <section>
                 <div className="flex items-center gap-2 mb-3 text-slate-300 text-sm font-medium">
-                  <Pencil size={16} className="text-green-400" />
+                  <Pencil size={16} className="text-[#ff462e]" />
                   <span>{t.lblPhrase}</span>
                 </div>
                 <textarea
                   value={customText}
                   onChange={(e) => setCustomText(e.target.value)}
                   rows={3}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500 transition-colors font-serif resize-none"
+                  className="w-full bg-[#111111] border border-[rgba(255,255,255,0.08)] rounded-lg p-3 text-sm text-[rgba(255,255,255,0.9)] focus:outline-none focus:border-[#ff462e] transition-colors font-serif resize-none"
                   placeholder="Type your own mantra here..."
                 />
                 <div className="flex gap-4 mt-3">
@@ -505,9 +508,9 @@ const Modal: React.FC<ModalProps> = ({
               </section>
 
               {/* MOVED AI SECTION UP */}
-              <section className="bg-slate-800/30 p-4 rounded-xl border border-slate-700/50">
+              <section className="bg-white/5 p-4 rounded-xl border border-[rgba(255,255,255,0.05)]">
                  <div className="flex items-center gap-2 mb-3 text-slate-200 text-sm font-medium">
-                    <ImageIcon size={16} className="text-purple-400" />
+                    <ImageIcon size={16} className="text-[#ff462e]" />
                     <span>{t.lblBg}</span>
                  </div>
                  
@@ -532,12 +535,12 @@ const Modal: React.FC<ModalProps> = ({
                           placeholder={t.aiPlaceholder}
                           value={aiPrompt}
                           onChange={(e) => setAiPrompt(e.target.value)}
-                          className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+                          className="flex-1 bg-[#111111] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ff462e]"
                        />
                        <button 
                          onClick={handleAiGenerate}
                          disabled={isGeneratingAi || !aiPrompt}
-                         className="disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,70,46,0.7)' }}
+                         className="disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 rounded-lg flex items-center justify-center" style={{ background: '#ff462e' }}
                        >
                          {isGeneratingAi ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                        </button>
@@ -558,16 +561,16 @@ const Modal: React.FC<ModalProps> = ({
               <section className="grid grid-cols-2 gap-4">
                  <div>
                     <div className="flex items-center gap-2 mb-2 text-slate-300 text-sm font-medium">
-                       <Type size={16} className="text-slate-400" />
+                       <Type size={16} className="text-[#ff462e]" />
                        <span>{t.lblFont}</span>
                     </div>
-                    <div className="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 mb-2">
+                    <div className="flex gap-1 bg-[#111111] p-1 rounded-lg border border-[rgba(255,255,255,0.08)] mb-2">
                       {(['serif', 'sans', 'classic', 'hand'] as FontFamily[]).map(f => (
-                         <button key={f} onClick={() => setStyle({...style, font: f})} className={`flex-1 h-8 rounded flex items-center justify-center ${style.font === f ? 'bg-slate-700 text-white' : 'text-slate-500'}`}>Aa</button>
+                         <button key={f} onClick={() => setStyle({...style, font: f})} className={`flex-1 h-8 rounded flex items-center justify-center transition-colors ${style.font === f ? 'bg-[#ff462e] text-white' : 'text-slate-500 hover:text-white'}`}>Aa</button>
                       ))}
                     </div>
                     {/* FONT SIZE CONTROL */}
-                    <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800">
+                    <div className="flex items-center gap-2 bg-[#111111] p-2 rounded-lg border border-[rgba(255,255,255,0.08)]">
                        <span className="text-[10px] text-slate-500">Size</span>
                        <input 
                          type="range" 
@@ -575,17 +578,17 @@ const Modal: React.FC<ModalProps> = ({
                          max="64" 
                          value={fontSize} 
                          onChange={(e) => setFontSize(Number(e.target.value))}
-                         className="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-slate-400"
+                         className="flex-1 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#ff462e]"
                        />
                        <span className="text-[10px] text-slate-400 w-4 text-right">{fontSize}</span>
                     </div>
                  </div>
                  <div>
                     <div className="flex items-center gap-2 mb-2 text-slate-300 text-sm font-medium">
-                       <Palette size={16} className="text-slate-400" />
+                       <Palette size={16} className="text-[#ff462e]" />
                        <span>{t.lblColor}</span>
                     </div>
-                    <div className="flex gap-1 justify-between bg-slate-900 p-1 rounded-lg border border-slate-800 items-center px-2 h-[42px] overflow-x-auto">
+                    <div className="flex gap-1 justify-between bg-[#111111] p-1 rounded-lg border border-[rgba(255,255,255,0.08)] items-center px-2 h-[42px] overflow-x-auto custom-scrollbar">
                        {(Object.keys(COLOR_MAP) as TextColor[]).map(c => (
                           <button key={c} onClick={() => setStyle({...style, color: c})} className={`w-4 h-4 rounded-full flex-shrink-0 ${style.color === c ? 'ring-2 ring-white' : ''}`} style={{ backgroundColor: c === 'black' ? '#0f172a' : c === 'slate' ? '#475569' : c === 'rose' ? '#be123c' : c === 'emerald' ? '#065f46' : c === 'violet' ? '#5b21b6' : c === 'amber' ? '#b45309' : '#ffffff' }} />
                        ))}
@@ -595,7 +598,7 @@ const Modal: React.FC<ModalProps> = ({
 
               <section>
                 <div className="flex items-center gap-2 mb-3 text-slate-300 text-sm font-medium">
-                  <Maximize2 size={16} className="text-blue-400" />
+                  <Maximize2 size={16} className="text-[#ff462e]" />
                   <span>{t.lblDim}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
@@ -605,8 +608,8 @@ const Modal: React.FC<ModalProps> = ({
                       onClick={() => setLocalAspectRatio(ratio)}
                       className={`py-2 px-1 rounded-lg text-[10px] font-medium border transition-all flex flex-col items-center justify-center gap-1
                         ${localAspectRatio === ratio 
-                          ? 'bg-slate-800 text-white border-blue-500' 
-                          : 'bg-slate-900/50 text-slate-400 border-slate-700 hover:border-slate-600'
+                          ? 'bg-[#111111] text-white border-[#ff462e]' 
+                          : 'bg-[rgba(255,255,255,0.03)] text-slate-400 border-[rgba(255,255,255,0.08)] hover:border-[#ff462e]'
                         }`}
                     >
                       {ratio === AspectRatio.STORY && <Smartphone size={12} />}
@@ -625,7 +628,7 @@ const Modal: React.FC<ModalProps> = ({
                   <button
                     onClick={() => setFrameColor('none')}
                     className={`w-12 h-12 flex-shrink-0 rounded-full border-2 transition-all relative flex items-center justify-center ${frameColor === 'none' ? 'ring-2 ring-white scale-110' : 'opacity-70'}`}
-                    style={{ backgroundColor: '#1e293b', borderColor: frameColor === 'none' ? 'white' : 'transparent' }}
+                    style={{ backgroundColor: '#111111', borderColor: frameColor === 'none' ? '#ff462e' : 'transparent' }}
                   >
                      <CircleOff size={20} className="text-slate-500" />
                   </button>
@@ -653,7 +656,7 @@ const Modal: React.FC<ModalProps> = ({
                       <button 
                         key={l}
                         onClick={() => setLogoStyle(l)}
-                        className={`p-2 rounded-lg border transition-all ${logoStyle === l ? 'bg-slate-800 border-rose-500 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200'}`}
+                        className={`p-2 rounded-lg border transition-all ${logoStyle === l ? 'bg-[#111111] border-[#ff462e] text-white' : 'bg-transparent border-[rgba(255,255,255,0.08)] text-slate-400 hover:text-white hover:border-[rgba(255,255,255,0.2)]'}`}
                       >
                          {React.cloneElement(LOGO_COMPONENTS[l] as React.ReactElement, { size: 16 })}
                       </button>
@@ -702,16 +705,16 @@ const Modal: React.FC<ModalProps> = ({
 
               {/* RELATED THOUGHTS */}
               {relatedThoughts.length > 0 && (
-                <section className="border-t border-slate-800 pt-6">
+                <section className="border-t border-[rgba(255,255,255,0.08)] pt-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
-                      <Layers size={16} className="text-blue-400" />
+                      <Layers size={16} className="text-[#ff462e]" />
                       <span>{localLanguage === 'es' ? 'Pensamientos Similares' : localLanguage === 'de' ? 'Ähnliche Gedanken' : 'Similar Thoughts'}</span>
                     </div>
                     {onSearch && (
                       <button 
                         onClick={() => onSearch(thought.category)}
-                        className="text-[10px] text-blue-400 hover:text-blue-300 font-bold uppercase tracking-wider"
+                        className="text-[10px] text-[#ff462e] hover:text-white transition-colors font-bold uppercase tracking-wider"
                       >
                         {localLanguage === 'es' ? 'Ver todos' : localLanguage === 'de' ? 'Alle ansehen' : 'See all'}
                       </button>
@@ -722,10 +725,10 @@ const Modal: React.FC<ModalProps> = ({
                       <button
                         key={th.id}
                         onClick={() => onSelectThought?.(th)}
-                        className="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-600 transition-all text-left group"
+                        className="p-3 rounded-xl bg-[#111111] border border-[rgba(255,255,255,0.08)] hover:border-[#ff462e] transition-all text-left flex flex-col h-full group"
                       >
-                        <p className="text-[10px] text-slate-500 mb-1 font-bold uppercase tracking-tighter truncate">{th.author}</p>
-                        <p className="text-[11px] text-slate-300 line-clamp-2 font-serif group-hover:text-white transition-colors">
+                        <p className="text-[10px] text-[#ff462e] mb-1 font-bold uppercase tracking-[2px] truncate">{th.author}</p>
+                        <p className="text-[11px] text-slate-300 line-clamp-3 font-serif group-hover:text-white transition-colors leading-relaxed">
                           {th.content[localLanguage].expansive}
                         </p>
                       </button>
@@ -736,14 +739,14 @@ const Modal: React.FC<ModalProps> = ({
 
             </div>
 
-            <div className="p-5 border-t border-slate-800 bg-[#0f172a] space-y-3">
+            <div className="p-5 border-t border-[rgba(255,255,255,0.08)] bg-[#090909] space-y-3">
               {/* DOWNLOAD FORMAT SELECTION */}
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{t.lblFormat}</span>
-                <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-[2px]">{t.lblFormat}</span>
+                <div className="flex bg-[#111111] rounded-lg p-1 border border-[rgba(255,255,255,0.08)]">
                    <button 
                      onClick={() => setDownloadFormat('jpg')} 
-                     className={`px-3 py-1 rounded text-[10px] font-bold flex items-center gap-1 transition-colors ${downloadFormat === 'jpg' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+                     className={`px-3 py-1 rounded text-[10px] font-bold flex items-center gap-1 transition-colors ${downloadFormat === 'jpg' ? 'bg-[#ff462e] text-white' : 'text-slate-500 hover:text-white'}`}
                    >
                      <FileImage size={12} /> JPG
                    </button>

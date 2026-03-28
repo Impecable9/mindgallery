@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { AspectRatio, Thought, StyleConfig, FontFamily, TextAlign, TextColor, Language } from '../types';
 import { CATEGORY_THEMES, COLOR_MAP } from '../constants';
-import { Lock, Download, Crown, Heart, AlertCircle, Search, ShoppingCart } from 'lucide-react';
+import { Heart, AlertCircle, Search, ShoppingCart, Lock } from 'lucide-react';
+import { GlowingEffect } from './GlowingEffect';
 
 interface ThoughtCardProps {
   thought: Thought;
@@ -77,12 +78,15 @@ const ThoughtCard: React.FC<ThoughtCardProps> = ({
       exit={{ opacity: 0, scale: 0.9 }}
       whileHover={{ y: -8, scale: 1.02, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      className={`relative group ${getDimensions()} flex items-center justify-center p-2`}
+      className={`relative group ${getDimensions()} flex items-center justify-center p-2 rounded-xl`}
     >
+      {/* Glow Effect from Phoenix Wall */}
+      <GlowingEffect spread={40} glow={false} disabled={false} proximity={80} inactiveZone={0.01} borderWidth={2} />
+
       {/* Physical Frame Simulation */}
       <div 
         onClick={onClick}
-        className={`absolute inset-0 rounded shadow-frame transform transition-transform duration-300 cursor-pointer ${isNegativeMode ? 'bg-[#1a1a1a] border border-gray-800' : 'bg-[#0f172a]'}`}
+        className={`absolute inset-0 rounded transform transition-transform duration-300 cursor-pointer ${isNegativeMode ? 'bg-[#1a1a1a] border border-gray-800' : 'bg-[#0f172a] border border-[rgba(255,255,255,0.15)] shadow-[0_0_30px_rgba(255,255,255,0.03)]'}`}
       ></div>
       
       {/* Matting & Canvas */}
